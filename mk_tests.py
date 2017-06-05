@@ -503,8 +503,8 @@ def main():
         mk_tests_for_binary(options.test_binary)
     if options.test_ternary >= 1:
         mk_tests_for_ternary(options.test_ternary)
-    if options.test_to_float >= 1:
-        mk_tests_for_real_to_float(options.test_to_float)
+    #if options.test_to_float >= 1:
+    #    mk_tests_for_real_to_float(options.test_to_float)
 
 if __name__ == "__main__":
     main()
