@@ -442,6 +442,9 @@ class MPF(object):
     def smtlib_from_ubv(self):
         return "(_ to_fp_unsigned %u %u)" % (self.w, self.p)
 
+    def smtlib_from_sbv(self):
+        return "(_ to_fp %u %u)" % (self.w, self.p)
+
     def smtlib_literals(self):
         choices = []
 

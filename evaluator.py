@@ -170,7 +170,10 @@ FP_OPS = {
                             "rnd"    : True,
                             "args"   : TYP_BV,
                             "result" : TYP_FLOAT},
-
+    "fp.from.sbv"        : {"arity"  : 1,
+                            "rnd"    : True,
+                            "args"   : TYP_BV,
+                            "result" : TYP_FLOAT},
 }
 
 def all_ops_where(arity = None, args = None, result = None):

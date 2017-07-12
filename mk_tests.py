@@ -30,13 +30,15 @@ import random
 import argparse
 from glob import glob
 
+from bitvector import *
 from floats import *
 from rationals import *
 from interval_q import *
 from evaluator import (fp_eval_predicate,
                        fp_eval_function,
                        is_rounding,
-                       all_ops_where, TYP_BOOL, TYP_REAL, TYP_FLOAT)
+                       all_ops_where,
+                       TYP_BOOL, TYP_BV, TYP_REAL, TYP_FLOAT)
 from out_smtlib import *
 
 ##############################################################################
@@ -251,6 +253,55 @@ def gen_vectors(fp_ops, n, test_dup):
             if k == -1:
                 break
 
+def gen_bv_vectors(fp_ops, n, test_dup):
+    assert n == 1
+
+    for bv_width in (8, 16, 32, 64, 128):
+        bv = BitVector(bv_width)
+        comment = "%s(BitVec %u)" % (fp_ops, bv_width)
+        for bit_0 in (0, 1):
+            bv.bv[0] = bit_0
+            for bit_1 in (0, 1):
+                bv.bv[1] = bit_1
+                for bit_penultimate in (0, 1):
+                    bv.bv[-2] = bit_penultimate
+                    for bit_last in (0, 1):
+                        bv.bv[-1] = bit_last
+                        for rm in gen_rm(fp_ops):
+                            # Zeros in middle
+                            bv.bv[2:-2] = [0] * (bv_width - 4)
+                            yield {
+                                "ops"         : fp_ops,
+                                "rounding"    : rm,
+                                "expectation" : random.choice(["sat", "unsat"]),
+                                "values"      : [bv],
+                                "comment"     : comment,
+                            }
+
+                            # Ones in middle
+                            bv.bv[2:-2] = [1] * (bv_width - 4)
+                            yield {
+                                "ops"         : fp_ops,
+                                "rounding"    : rm,
+                                "expectation" : random.choice(["sat", "unsat"]),
+                                "values"      : [bv],
+                                "comment"     : comment,
+                            }
+
+                            # Random in middle
+                            for _ in xrange(test_dup):
+                                for b in xrange(2, 2 + bv_width - 4):
+                                    bv.bv[b] = random.randint(0, 1)
+                                yield {
+                                    "ops"         : fp_ops,
+                                    "rounding"    : rm,
+                                    "expectation" : random.choice(["sat",
+                                                                   "unsat"]),
+                                    "values"      : [bv],
+                                    "comment"     : comment,
+                                }
+
+
 ##############################################################################
 # Test generation
 ##############################################################################
@@ -382,65 +433,38 @@ def mk_tests_for_ternary(num_tests):
 
 def mk_tests_from_bitvector(num_tests):
     # convert signed and unsigned bitvector to float
-    # - do bv -> float
-    # - also do int -> bv -> float
-    # - vary size of bitvector
-    def gen_bv_vectors(num_tests):
-        for bv_width in (8, 16, 32, 64, 128):
-            bv = [0] * bv_width
-            for bit_0 in (0, 1):
-                bv[0] = bit_0
-                for bit_1 in (0, 1):
-                    bv[1] = bit_1
-                    for bit_penultimate in (0, 1):
-                        bv[-2] = bit_penultimate
-                        for bit_last in (0, 1):
-                            bv[-1] = bit_last
-                            for rm in MPF.ROUNDING_MODES:
-                                v_exp = random.choice(["sat", "unsat"])
-                                vec = {
-                                    "ops"         : "fp.from.ubv",
-                                    "rounding"    : rm,
-                                    "expectation" : v_exp,
-                                    "values"      : bv,
-                                    "comment"     : "ubv -> float",
-                                    }
-                                for i in xrange(num_tests):
-                                    # Zeros in middle
-                                    bv[2:-2] = [0] * (bv_width - 4)
-                                    yield vec
-                                    # Ones in middle
-                                    bv[2:-2] = [1] * (bv_width - 4)
-                                    yield vec
-                                    # Random in middle
-                                    for b in xrange(2, 2 + bv_width - 4):
-                                        bv[b] = random.randint(0, 1)
-                                    yield vec
 
-    n = 0
-    for vec in gen_bv_vectors(num_tests):
-        n += 1
-        if n < 2:
-            continue
+    def mk_test(vec):
+        assert vec["ops"] in ("fp.from.ubv", "fp.from.sbv")
 
-        as_ubv = 0
-        for b in vec["values"]:
-            as_ubv *= 2
-            as_ubv |= b
+        interval = random.choice(["<=", "=", ">="])
+
+        x = vec["values"][0]
 
         fmt = random.choice([
             (5, 11),
             (8, 24),
             (11, 53),
+            #(15, 113),
             #(random.randint(3, 10), random.randint(3, 10)),
         ])
-
         f = MPF(fmt[0], fmt[1])
-        f.from_rational(vec["rounding"], Rational(as_ubv))
 
-        operation = random.choice(["<=", "=", ">="])
+        if vec["ops"] == "fp.from_ubv":
+            as_int = x.to_unsigned_int()
+            bv_rel = {"<=" : "bvule",
+                      "="  : "=",
+                      ">=" : "bvuge"}[interval]
+            fp_ops = f.smtlib_from_ubv()
+        else:
+            as_int = x.to_signed_int()
+            bv_rel = {"<=" : "bvsle",
+                      "="  : "=",
+                      ">=" : "bvsge"}[interval]
+            fp_ops = f.smtlib_from_sbv()
 
-        vec["comment"] = "ubv(%s %u) -> float" % (operation, as_ubv)
+        q = Rational(as_int)
+        f.from_rational(vec["rounding"], q)
 
         with new_test(vec) as fd:
             smt_write_header(fd,
@@ -450,27 +474,31 @@ def mk_tests_from_bitvector(num_tests):
             smt_write_var(
                 fd,
                 var_name    = "x",
-                var_type    = "(_ BitVec %u)" % len(vec["values"]),
-                assertion   = "(%s x #b%s)" % ({"<=" : "bvule",
-                                                "="  : "=",
-                                                ">=" : "bvuge"}[operation],
-                                               "".join(map(str,
-                                                           vec["values"]))),
-                expectation = str(as_ubv))
+                var_type    = x.smtlib_sort(),
+                assertion   = "(%s x %s)" % (bv_rel,
+                                             x.smtlib_random_literal()),
+                expectation = str(as_int))
             smt_write_var(
                 fd,
                 var_name    = "r",
                 var_type    = f.smtlib_sort(),
-                assertion   = "(= r (%s %s x))" % (f.smtlib_from_ubv(),
+                assertion   = "(= r (%s %s x))" % (fp_ops,
                                                    vec["rounding"]))
             smt_write_goal(
                 fd,
                 bool_expr   = "(%s r %s)" % ({"<=" : "fp.leq",
                                               "="  : "fp.eq",
-                                              ">=" : "fp.geq"}[operation],
+                                              ">=" : "fp.geq"}[interval],
                                              f.smtlib_random_literal()),
                 expectation = vec["expectation"])
             smt_write_footer(fd)
+
+
+    for vec in gen_bv_vectors("fp.from.ubv", 1, num_tests):
+        mk_test(vec)
+
+    for vec in gen_bv_vectors("fp.from.sbv", 1, num_tests):
+        mk_test(vec)
 
 def mk_tests_for_real_to_float(num_tests):
     # We pick a random float; then determine the rational interval that would
