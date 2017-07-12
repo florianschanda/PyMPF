@@ -36,10 +36,11 @@ def smt_opsname(fp_ops):
     else:
         return fp_ops
 
-def smt_write_header(fd, status, comment=None):
+def smt_write_header(fd, status, comment=None, logic="QF_FP"):
     assert status in ("sat", "unsat")
-    fd.write("(set-logic QF_FP)\n")
-    fd.write("(set-option :produce-models true)\n")
+    fd.write("(set-logic %s)\n" % logic)
+    if status == "sat":
+        fd.write("(set-option :produce-models true)\n")
     fd.write("(set-info :source |%s|)\n" % SOURCE_STRING)
     fd.write("(set-info :category random)\n")
     fd.write("(set-info :status %s)\n" % status)

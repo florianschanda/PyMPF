@@ -380,6 +380,98 @@ def mk_tests_for_ternary(num_tests):
                            vec["expectation"])
             smt_write_footer(fd)
 
+def mk_tests_from_bitvector(num_tests):
+    # convert signed and unsigned bitvector to float
+    # - do bv -> float
+    # - also do int -> bv -> float
+    # - vary size of bitvector
+    def gen_bv_vectors(num_tests):
+        for bv_width in (8, 16, 32, 64, 128):
+            bv = [0] * bv_width
+            for bit_0 in (0, 1):
+                bv[0] = bit_0
+                for bit_1 in (0, 1):
+                    bv[1] = bit_1
+                    for bit_penultimate in (0, 1):
+                        bv[-2] = bit_penultimate
+                        for bit_last in (0, 1):
+                            bv[-1] = bit_last
+                            for rm in MPF.ROUNDING_MODES:
+                                v_exp = random.choice(["sat", "unsat"])
+                                vec = {
+                                    "ops"         : "fp.from.ubv",
+                                    "rounding"    : rm,
+                                    "expectation" : v_exp,
+                                    "values"      : bv,
+                                    "comment"     : "ubv -> float",
+                                    }
+                                for i in xrange(num_tests):
+                                    # Zeros in middle
+                                    bv[2:-2] = [0] * (bv_width - 4)
+                                    yield vec
+                                    # Ones in middle
+                                    bv[2:-2] = [1] * (bv_width - 4)
+                                    yield vec
+                                    # Random in middle
+                                    for b in xrange(2, 2 + bv_width - 4):
+                                        bv[b] = random.randint(0, 1)
+                                    yield vec
+
+    n = 0
+    for vec in gen_bv_vectors(num_tests):
+        n += 1
+        if n < 2:
+            continue
+
+        as_ubv = 0
+        for b in vec["values"]:
+            as_ubv *= 2
+            as_ubv |= b
+
+        fmt = random.choice([
+            (5, 11),
+            (8, 24),
+            (11, 53),
+            #(random.randint(3, 10), random.randint(3, 10)),
+        ])
+
+        f = MPF(fmt[0], fmt[1])
+        f.from_rational(vec["rounding"], Rational(as_ubv))
+
+        operation = random.choice(["<=", "=", ">="])
+
+        vec["comment"] = "ubv(%s %u) -> float" % (operation, as_ubv)
+
+        with new_test(vec) as fd:
+            smt_write_header(fd,
+                             status  = vec["expectation"],
+                             comment = vec["comment"],
+                             logic   = "QF_FPBV")
+            smt_write_var(
+                fd,
+                var_name    = "x",
+                var_type    = "(_ BitVec %u)" % len(vec["values"]),
+                assertion   = "(%s x #b%s)" % ({"<=" : "bvule",
+                                                "="  : "=",
+                                                ">=" : "bvuge"}[operation],
+                                               "".join(map(str,
+                                                           vec["values"]))),
+                expectation = str(as_ubv))
+            smt_write_var(
+                fd,
+                var_name    = "r",
+                var_type    = f.smtlib_sort(),
+                assertion   = "(= r (%s %s x))" % (f.smtlib_from_ubv(),
+                                                   vec["rounding"]))
+            smt_write_goal(
+                fd,
+                bool_expr   = "(%s r %s)" % ({"<=" : "fp.leq",
+                                              "="  : "fp.eq",
+                                              ">=" : "fp.geq"}[operation],
+                                             f.smtlib_random_literal()),
+                expectation = vec["expectation"])
+            smt_write_footer(fd)
+
 def mk_tests_for_real_to_float(num_tests):
     # We pick a random float; then determine the rational interval that would
     # round onto that float. we then select rationals from:
@@ -481,10 +573,9 @@ def main():
     ap.add_argument("--test_relations", metavar="N", type=int,
                     default=0,
                     help="Generate tests for all binary relations.")
-    # real -> float not supported yet
-    #ap.add_argument("--test_to_float", metavar="N", type=int,
-    #                default=0,
-    #                help="Generate tests for conversion to float.")
+    ap.add_argument("--test_conversion", metavar="N", type=int,
+                    default=0,
+                    help="Generate tests for conversion to/from float.")
     options = ap.parse_args()
 
     for d in glob("fp.*") + glob("smtlib.*"):
@@ -503,8 +594,10 @@ def main():
         mk_tests_for_binary(options.test_binary)
     if options.test_ternary >= 1:
         mk_tests_for_ternary(options.test_ternary)
-    #if options.test_to_float >= 1:
-    #    mk_tests_for_real_to_float(options.test_to_float)
+    if options.test_conversion >= 1:
+        mk_tests_from_bitvector(options.test_conversion)
+        # work in progress
+        # mk_tests_for_real_to_float(options.test_to_float)
 
 if __name__ == "__main__":
     main()

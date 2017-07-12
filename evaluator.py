@@ -58,6 +58,7 @@ VALID_MPFR_ROUNDING_MODES = (RM_RNE, RM_RTP, RM_RTN, RM_RTZ)
 TYP_BOOL  = "boolean"
 TYP_FLOAT = "float"
 TYP_REAL  = "real"
+TYP_BV    = "bitvector"
 
 FP_OPS = {
     "fp.abs"             : {"arity"  : 1,
@@ -165,6 +166,11 @@ FP_OPS = {
                             "rnd"    : True,
                             "args"   : TYP_REAL,
                             "result" : TYP_FLOAT},
+    "fp.from.ubv"        : {"arity"  : 1,
+                            "rnd"    : True,
+                            "args"   : TYP_BV,
+                            "result" : TYP_FLOAT},
+
 }
 
 def all_ops_where(arity = None, args = None, result = None):
