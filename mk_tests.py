@@ -129,6 +129,26 @@ def largest_normal(sign=0):
     rv.pack(S, E, T)
     return rv
 
+def ubv_boundary(bv_width, sign=0):
+    bv = BitVector(bv_width)
+    if sign > 0 or (sign == 0 and random.getrandbits(1)):
+        q = Rational(bv.max_unsigned)
+    else:
+        q = Rational(bv.min_unsigned)
+    rv = MPF(8, 24)
+    rv.from_rational(RM_RNE, q)
+    return rv
+
+def sbv_boundary(bv_width, sign=0):
+    bv = BitVector(bv_width)
+    if sign > 0 or (sign == 0 and random.getrandbits(1)):
+        q = Rational(bv.max_signed)
+    else:
+        q = Rational(bv.min_signed)
+    rv = MPF(8, 24)
+    rv.from_rational(RM_RNE, q)
+    return rv
+
 ##############################################################################
 # Random rationals
 ##############################################################################
@@ -208,6 +228,13 @@ def gen_vectors(fp_ops, n, test_dup):
         "+inf"       : lambda: random_infinite(1),
         "nan"        : lambda: random_nan(),
     }
+    if fp_ops in ("fp.to.ubv", "fp.to.sbv"):
+        for k in ("-minsub", "+minsub",
+                  "-maxsub", "+maxsub"):
+            del CONSTRUCTORS[k]
+        CONSTRUCTORS["-sbv_8_bound"] = lambda: sbv_boundary(8, -1)
+        CONSTRUCTORS["+sbv_8_bound"] = lambda: sbv_boundary(8, 1)
+        CONSTRUCTORS["+ubv_8_bound"] = lambda: ubv_boundary(8, 1)
 
     TARGETS   = tuple(sorted(list(CONSTRUCTORS)))
     N_TARGETS = len(TARGETS)
@@ -433,8 +460,7 @@ def mk_tests_for_ternary(num_tests):
 
 def mk_tests_from_bitvector(num_tests):
     # convert signed and unsigned bitvector to float
-
-    def mk_test(vec):
+    def mk_test_from(vec):
         assert vec["ops"] in ("fp.from.ubv", "fp.from.sbv")
 
         interval = random.choice(["<=", "=", ">="])
@@ -493,12 +519,99 @@ def mk_tests_from_bitvector(num_tests):
                 expectation = vec["expectation"])
             smt_write_footer(fd)
 
+    # convert float (+/- some interesting values) to a bitvector
+    def mk_test_to(vec, bv_width, shift=Rational(0)):
+        assert vec["ops"] in ("fp.to.ubv", "fp.to.sbv")
+
+        bv = BitVector(bv_width)
+        for i in xrange(bv_width):
+            bv.bv[i] = random.randint(0, 1)
+
+        x = vec["values"][0]
+        if not shift.isZero():
+            if x.isInfinite() or x.isNaN():
+                return
+            fudge = x.new_mpf()
+            fudge.from_rational(vec["rounding"], shift)
+            x = fp_add(vec["rounding"], x, fudge)
+
+        unspecified = x.isNaN() or x.isInfinite()
+
+        if not unspecified:
+            i = fp_roundToIntegral(vec["rounding"], x)
+            q = i.to_rational()
+            assert q.isIntegral()
+
+            if vec["ops"] == "fp.to.ubv":
+                unspecified = not (Rational(bv.min_unsigned) <=
+                                   q <=
+                                   Rational(bv.max_unsigned))
+            else:
+                unspecified = not (Rational(bv.min_signed) <=
+                                   q <=
+                                   Rational(bv.max_signed))
+
+        if not unspecified:
+            if vec["ops"] == "fp.to.ubv":
+                bv.from_unsigned_int(q.a)
+            else:
+                bv.from_signed_int(q.a)
+            expectation = vec["expectation"]
+        else:
+            expectation = "sat"
+
+        with new_test(vec) as fd:
+            smt_write_header(fd, expectation, vec["comment"], "QF_FPBV")
+            smt_write_var(
+                fd,
+                var_name    = "x",
+                var_type    = x.smtlib_sort(),
+                assertion   = "(= x %s)" % x.smtlib_random_literal())
+            smt_write_var(
+                fd,
+                var_name    = "y",
+                var_type    = bv.smtlib_sort(),
+                assertion   = "(= y ((_ %s %u) %s x))" % (
+                    {"fp.to.ubv" : "fp.to_ubv",
+                     "fp.to.sbv" : "fp.to_sbv"}[vec["ops"]],
+                    bv.width,
+                    vec["rounding"]),
+                expectation = "unspecified" if unspecified else None)
+            if not unspecified or random.randint(0, 1) == 0:
+                z_assertion = "(= z %s)" % bv.smtlib_random_literal()
+            else:
+                z_assertion = None
+            smt_write_var(
+                fd,
+                var_name    = "z",
+                var_type    = bv.smtlib_sort(),
+                assertion   = z_assertion)
+            smt_write_goal(
+                fd,
+                bool_expr   = "(= y z)",
+                expectation = expectation,
+                correct_answer = random.choice([True, False]) if unspecified else True)
+            smt_write_footer(fd)
+
 
     for vec in gen_bv_vectors("fp.from.ubv", 1, num_tests):
-        mk_test(vec)
+        mk_test_from(vec)
 
     for vec in gen_bv_vectors("fp.from.sbv", 1, num_tests):
-        mk_test(vec)
+        mk_test_from(vec)
+
+    q_half = Rational(1, 2)
+    for vec in gen_vectors("fp.to.ubv", 1, num_tests):
+        for bv_width in (8, 32, 64):
+            mk_test_to(vec, bv_width)
+            mk_test_to(vec, bv_width, shift=q_half)
+            mk_test_to(vec, bv_width, shift=-q_half)
+
+    for vec in gen_vectors("fp.to.sbv", 1, num_tests):
+        for bv_width in (8, 32, 64):
+            mk_test_to(vec, bv_width)
+            mk_test_to(vec, bv_width, shift=q_half)
+            mk_test_to(vec, bv_width, shift=-q_half)
 
 def mk_tests_for_real_to_float(num_tests):
     # We pick a random float; then determine the rational interval that would
