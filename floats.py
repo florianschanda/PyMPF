@@ -757,10 +757,7 @@ def fp_roundToIntegral(rm, op):
                         rv.from_rational(rm, Rational(high))
                     assert rv.bv % 2 == 0
                 else:
-                    assert rm == RM_RNA
-                    if rv.bv % 2 == 0:
-                        rv.from_rational(rm, Rational(high))
-                    assert rv.bv % 2 == 1
+                    rv.from_rational(rm, Rational(high))
         elif rm == RM_RTP:
             rv.from_rational(rm, Rational(high))
         elif rm == RM_RTN:
