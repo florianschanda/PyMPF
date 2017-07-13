@@ -42,6 +42,7 @@ import random
 
 from rationals import *
 from interval_q import Interval
+from bitvector import BitVector
 from bisect import Bisect
 
 ##############################################################################
@@ -275,6 +276,21 @@ class MPF(object):
             v = Rational(0)
 
         return v
+
+    def to_int(self, rm):
+        assert rm in MPF.ROUNDING_MODES
+        assert self.isFinite()
+
+        rnd = {RM_RNE : q_round_even,
+               RM_RNA : q_round_away_from_zero,
+               RM_RTP : q_round_to_positive,
+               RM_RTN : q_round_to_negative,
+               RM_RTZ : q_round_to_zero}[rm]
+
+        q = rnd(self.to_rational())
+
+        assert q.isIntegral()
+        return q.a
 
     ######################################################################
     # Setters
@@ -722,55 +738,15 @@ def fp_roundToIntegral(rm, op):
     assert rm in MPF.ROUNDING_MODES
 
     rv = op.new_mpf()
-    if op.isZero() or op.isInfinite() or op.isNaN() or op.isIntegral():
+    if op.isInfinite() or op.isNaN() or op.isIntegral():
         # Nothing to do here
         pass
     else:
-        target = op.to_rational()
-        assert abs(target) <= q_pow2(op.p)
+        i = op.to_int(rm)
+        rv.from_rational(rm, Rational(i))
 
-        # Find FP integral just below and above
-        high = 2 ** op.p
-        low  = -high
-
-        for guess in Bisect(low, high):
-            v = guess.value()
-
-            if Rational(v) > target:
-                guess.too_high()
-                high = v
-            elif Rational(v) < target:
-                guess.too_low()
-                low = v
-            else:
-                assert False
-
-        if rm in MPF.ROUNDING_MODES_NEAREST:
-            if target - Rational(low) < Rational(high) - target:
-                rv.from_rational(rm, Rational(low))
-            elif target - Rational(low) > Rational(high) - target:
-                rv.from_rational(rm, Rational(high))
-            else:
-                rv.from_rational(rm, Rational(low))
-                if rm == RM_RNE:
-                    if rv.bv % 2 == 1:
-                        rv.from_rational(rm, Rational(high))
-                    assert rv.bv % 2 == 0
-                else:
-                    rv.from_rational(rm, Rational(high))
-        elif rm == RM_RTP:
-            rv.from_rational(rm, Rational(high))
-        elif rm == RM_RTN:
-            rv.from_rational(rm, Rational(low))
-        else:
-            assert rm == RM_RTZ
-            if abs(low) < abs(high):
-                rv.from_rational(rm, Rational(low))
-            else:
-                rv.from_rational(rm, Rational(high))
-
-        # We always preserve the sign in this operation (see 5.9)
-        rv.set_sign_bit(target.isNegative())
+        if i == 0 and op.isNegative():
+            rv.set_sign_bit(True)
 
     return rv
 
@@ -842,7 +818,31 @@ def fp_nextDown(op):
     # This is how it is defined in 5.3.1
     return -fp_nextUp(-op)
 
+def fp_to_ubv(op, rm, width):
+    if op.isInfinite() or op.isNaN():
+        raise Unspecified
 
+    bv = BitVector(width)
+
+    i = op.to_int(rm)
+    if bv.min_unsigned <= i <= bv.max_unsigned:
+        bv.from_unsigned_int(i)
+        return bv
+    else:
+        raise Unspecified
+
+def fp_to_sbv(op, rm, width):
+    if op.isInfinite() or op.isNaN():
+        raise Unspecified
+
+    bv = BitVector(width)
+
+    i = op.to_int(rm)
+    if bv.min_signed <= i <= bv.max_signed:
+        bv.from_signed_int(i)
+        return bv
+    else:
+        raise Unspecified
 
 def interval_nearest(rm, op):
     assert rm in MPF.ROUNDING_MODES_NEAREST
