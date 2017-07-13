@@ -129,6 +129,14 @@ def largest_normal(sign=0):
     rv.pack(S, E, T)
     return rv
 
+def random_halfpoint(sign=0):
+    # Returns something.5 which is great to test various tie-breaks
+    rv = MPF(8, 24)
+    i = random.randint(0, 2 ** (rv.p - 1) - 1)
+    rv.from_rational(RM_RNE, Rational(i * 2 + 1, 2))
+    rv.set_sign_bit(sign < 0 or (sign == 0 and random.getrandbits(1) == 0))
+    return rv
+
 def ubv_boundary(bv_width, sign=0):
     bv = BitVector(bv_width)
     if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
@@ -222,6 +230,8 @@ def gen_vectors(fp_ops, n, test_dup):
         "+minnormal" : lambda: smallest_normal(1),
         "-normal"    : lambda: random_normal(-1),
         "+normal"    : lambda: random_normal(1),
+        "-halfpoint" : lambda: random_halfpoint(-1),
+        "+halfpoint" : lambda: random_halfpoint(1),
         "-maxnormal" : lambda: largest_normal(-1),
         "+maxnormal" : lambda: largest_normal(1),
         "-inf"       : lambda: random_infinite(-1),
