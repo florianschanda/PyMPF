@@ -281,13 +281,7 @@ class MPF(object):
         assert rm in MPF.ROUNDING_MODES
         assert self.isFinite()
 
-        rnd = {RM_RNE : q_round_even,
-               RM_RNA : q_round_away_from_zero,
-               RM_RTP : q_round_to_positive,
-               RM_RTN : q_round_to_negative,
-               RM_RTZ : q_round_to_zero}[rm]
-
-        q = rnd(self.to_rational())
+        q = q_round(rm, self.to_rational())
 
         assert q.isIntegral()
         return q.a
@@ -725,7 +719,7 @@ def fp_rem(left, right):
         # Result is left
         pass
     else:
-        n = q_round_even(left.to_rational() / right.to_rational())
+        n = q_round_rne(left.to_rational() / right.to_rational())
         r = left.to_rational() - (right.to_rational() * n)
         # Rounding mode is irrelevant here, r will be exact
         rv.from_rational(RM_RNE, r)

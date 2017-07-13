@@ -26,6 +26,7 @@
 # wheel.
 
 import fractions
+import floats
 
 class Rational(object):
     def __init__(self, a=0, b=1):
@@ -94,7 +95,7 @@ def q_pow2(n):
     else:
         return Rational(1, 2**(-n))
 
-def q_round(n, tiebreak):
+def q_round_to_nearest(n, tiebreak):
     lower = (n.a - (n.a % n.b)) /  n.b
     upper = lower + 1
     assert Rational(lower) <= n <= Rational(upper)
@@ -106,37 +107,53 @@ def q_round(n, tiebreak):
     else:
         return Rational(tiebreak(lower, upper))
 
-def q_round_even(n):
+def q_round_rne(n):
     def tiebreak(lower, upper):
         if lower % 2 == 0:
             return lower
         else:
             assert upper % 2 == 0
             return upper
-    return q_round(n, tiebreak)
+    return q_round_to_nearest(n, tiebreak)
 
-def q_round_to_zero(n):
-    def tiebreak(lower, upper):
-        if abs(lower) < abs(upper):
-            return lower
-        else:
-            return upper
-    return q_round(n, tiebreak)
-
-def q_round_away_from_zero(n):
+def q_round_rna(n):
     def tiebreak(lower, upper):
         if abs(lower) > abs(upper):
             return lower
         else:
             return upper
-    return q_round(n, tiebreak)
+    return q_round_to_nearest(n, tiebreak)
 
-def q_round_to_positive(n):
-    def tiebreak(lower, upper):
-        return upper
-    return q_round(n, tiebreak)
+def q_round_rtz(n):
+    i = Rational(abs(n.a) / n.b)
+    if n.isNegative():
+        return -i
+    else:
+        return i
 
-def q_round_to_negative(n):
-    def tiebreak(lower, upper):
-        return lower
-    return q_round(n, tiebreak)
+def q_round_rtp(n):
+    if n.isIntegral():
+        return n
+    i = abs(n.a) / n.b
+    if n.isNegative():
+        return Rational(-i)
+    else:
+        return Rational(i + 1)
+
+def q_round_rtn(n):
+    if n.isIntegral():
+        return n
+    i = abs(n.a) / n.b
+    if n.isNegative():
+        return Rational(-i - 1)
+    else:
+        return Rational(i)
+
+def q_round(rm, n):
+    assert rm in floats.MPF.ROUNDING_MODES
+    rnd = {floats.RM_RNE : q_round_rne,
+           floats.RM_RNA : q_round_rna,
+           floats.RM_RTZ : q_round_rtz,
+           floats.RM_RTP : q_round_rtp,
+           floats.RM_RTN : q_round_rtn}[rm]
+    return rnd(n)
