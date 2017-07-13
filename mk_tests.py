@@ -523,10 +523,6 @@ def mk_tests_from_bitvector(num_tests):
     def mk_test_to(vec, bv_width, shift=Rational(0)):
         assert vec["ops"] in ("fp.to.ubv", "fp.to.sbv")
 
-        bv = BitVector(bv_width)
-        for i in xrange(bv_width):
-            bv.bv[i] = random.randint(0, 1)
-
         x = vec["values"][0]
         if not shift.isZero():
             if x.isInfinite() or x.isNaN():
@@ -535,29 +531,21 @@ def mk_tests_from_bitvector(num_tests):
             fudge.from_rational(vec["rounding"], shift)
             x = fp_add(vec["rounding"], x, fudge)
 
-        unspecified = x.isNaN() or x.isInfinite()
-
-        if not unspecified:
-            i = fp_roundToIntegral(vec["rounding"], x)
-            q = i.to_rational()
-            assert q.isIntegral()
-
+        try:
             if vec["ops"] == "fp.to.ubv":
-                unspecified = not (Rational(bv.min_unsigned) <=
-                                   q <=
-                                   Rational(bv.max_unsigned))
+                bv = fp_to_ubv(x, vec["rounding"], bv_width)
+                y_expectation = str(bv.to_unsigned_int())
             else:
-                unspecified = not (Rational(bv.min_signed) <=
-                                   q <=
-                                   Rational(bv.max_signed))
-
-        if not unspecified:
-            if vec["ops"] == "fp.to.ubv":
-                bv.from_unsigned_int(q.a)
-            else:
-                bv.from_signed_int(q.a)
+                bv = fp_to_sbv(x, vec["rounding"], bv_width)
+                y_expectation = str(bv.to_signed_int())
+            unspecified = False
             expectation = vec["expectation"]
-        else:
+        except Unspecified:
+            bv = BitVector(bv_width)
+            for i in xrange(bv_width):
+                bv.bv[i] = random.randint(0, 1)
+            y_expectation = "unspecified"
+            unspecified = True
             expectation = "sat"
 
         with new_test(vec) as fd:
@@ -576,7 +564,7 @@ def mk_tests_from_bitvector(num_tests):
                      "fp.to.sbv" : "fp.to_sbv"}[vec["ops"]],
                     bv.width,
                     vec["rounding"]),
-                expectation = "unspecified" if unspecified else None)
+                expectation = y_expectation)
             if not unspecified or random.randint(0, 1) == 0:
                 z_assertion = "(= z %s)" % bv.smtlib_random_literal()
             else:
@@ -590,7 +578,9 @@ def mk_tests_from_bitvector(num_tests):
                 fd,
                 bool_expr   = "(= y z)",
                 expectation = expectation,
-                correct_answer = random.choice([True, False]) if unspecified else True)
+                correct_answer = (random.choice([True, False])
+                                  if unspecified
+                                  else True))
             smt_write_footer(fd)
 
 
