@@ -47,7 +47,7 @@ from out_smtlib import *
 
 def random_zero(sign=0):
     rv = MPF(8, 24)
-    if sign > 0 or (sign == 0 and random.getrandbits(1)):
+    if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         rv.set_zero(0)
     else:
         rv.set_zero(1)
@@ -55,7 +55,7 @@ def random_zero(sign=0):
 
 def random_subnormal(sign=0):
     rv = MPF(8, 24)
-    S = (0 if sign > 0 or (sign == 0 and random.getrandbits(1)) else 1)
+    S = (0 if sign > 0 or (sign == 0 and random.getrandbits(1) == 0) else 1)
     E = 0
     T = random.randrange(1, 2 ** rv.t)
     rv.pack(S, E, T)
@@ -63,7 +63,7 @@ def random_subnormal(sign=0):
 
 def random_normal(sign=0):
     rv = MPF(8, 24)
-    S = (0 if sign > 0 or (sign == 0 and random.getrandbits(1)) else 1)
+    S = (0 if sign > 0 or (sign == 0 and random.getrandbits(1) == 0) else 1)
     E = random.randrange(1, 2 ** rv.w - 1)
     T = random.randrange(0, 2 ** rv.t)
     rv.pack(S, E, T)
@@ -71,7 +71,7 @@ def random_normal(sign=0):
 
 def random_infinite(sign=0):
     rv = MPF(8, 24)
-    if sign > 0 or (sign == 0 and random.getrandbits(1)):
+    if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         rv.set_infinite(0)
     else:
         rv.set_infinite(1)
@@ -87,7 +87,7 @@ def random_nan():
 
 def smallest_subnormal(sign=0):
     rv = MPF(8, 24)
-    if sign > 0 or (sign == 0 and random.getrandbits(1)):
+    if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         S = 0
     else:
         S = 1
@@ -98,7 +98,7 @@ def smallest_subnormal(sign=0):
 
 def largest_subnormal(sign=0):
     rv = MPF(8, 24)
-    if sign > 0 or (sign == 0 and random.getrandbits(1)):
+    if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         S = 0
     else:
         S = 1
@@ -109,7 +109,7 @@ def largest_subnormal(sign=0):
 
 def smallest_normal(sign=0):
     rv = MPF(8, 24)
-    if sign > 0 or (sign == 0 and random.getrandbits(1)):
+    if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         S = 0
     else:
         S = 1
@@ -120,7 +120,7 @@ def smallest_normal(sign=0):
 
 def largest_normal(sign=0):
     rv = MPF(8, 24)
-    if sign > 0 or (sign == 0 and random.getrandbits(1)):
+    if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         S = 0
     else:
         S = 1
@@ -131,7 +131,7 @@ def largest_normal(sign=0):
 
 def ubv_boundary(bv_width, sign=0):
     bv = BitVector(bv_width)
-    if sign > 0 or (sign == 0 and random.getrandbits(1)):
+    if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         q = Rational(bv.max_unsigned)
     else:
         q = Rational(bv.min_unsigned)
@@ -141,7 +141,7 @@ def ubv_boundary(bv_width, sign=0):
 
 def sbv_boundary(bv_width, sign=0):
     bv = BitVector(bv_width)
-    if sign > 0 or (sign == 0 and random.getrandbits(1)):
+    if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         q = Rational(bv.max_signed)
     else:
         q = Rational(bv.min_signed)
