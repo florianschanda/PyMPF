@@ -1,0 +1,4 @@
+*.smt2
+*.pyc
+eval__*
+tmp.c
