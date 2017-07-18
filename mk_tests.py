@@ -486,13 +486,14 @@ def mk_tests_from_bitvector(num_tests):
         ])
         f = MPF(fmt[0], fmt[1])
 
-        if vec["ops"] == "fp.from_ubv":
+        if vec["ops"] == "fp.from.ubv":
             as_int = x.to_unsigned_int()
             bv_rel = {"<=" : "bvule",
                       "="  : "=",
                       ">=" : "bvuge"}[interval]
             fp_ops = f.smtlib_from_ubv()
         else:
+            assert vec["ops"] == "fp.from.sbv"
             as_int = x.to_signed_int()
             bv_rel = {"<=" : "bvsle",
                       "="  : "=",
