@@ -36,7 +36,7 @@
 # (which is fast, but complicated and does not totally map onto IEEE
 # floats).
 
-# TODO: Implement RNA
+# TODO: Implement RNA in intervals
 
 import random
 
@@ -221,11 +221,7 @@ class MPF(object):
                     assert self.bv % 2 == 0
                 else:
                     assert rm == RM_RNA
-                    if high % 2 == 1:
-                        self.bv = high
-                    else:
-                        self.bv = low
-                    assert self.bv % 2 == 1
+                    self.bv = high
             elif target < halfpoint:
                 self.bv = low
             else:
