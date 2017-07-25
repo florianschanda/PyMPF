@@ -38,10 +38,13 @@ def smt_opsname(fp_ops):
 
 def smt_write_header(fd, status, comment=None, logic="QF_FP"):
     assert status in ("sat", "unsat")
+    fd.write("(set-info :smt-lib-version 2.6)")
     fd.write("(set-logic %s)\n" % logic)
     if status == "sat":
         fd.write("(set-option :produce-models true)\n")
     fd.write("(set-info :source |%s|)\n" % SOURCE_STRING)
+    fd.write("(set-info :license |%s|)\n" %
+             "https://www.gnu.org/licenses/gpl-3.0.html")
     fd.write("(set-info :category random)\n")
     fd.write("(set-info :status %s)\n" % status)
     if comment is not None:
