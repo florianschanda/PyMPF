@@ -38,7 +38,7 @@ def smt_opsname(fp_ops):
 
 def smt_write_header(fd, status, comment=None, logic="QF_FP"):
     assert status in ("sat", "unsat")
-    fd.write("(set-info :smt-lib-version 2.6)")
+    fd.write("(set-info :smt-lib-version 2.6)\n")
     fd.write("(set-logic %s)\n" % logic)
     if status == "sat":
         fd.write("(set-option :produce-models true)\n")
