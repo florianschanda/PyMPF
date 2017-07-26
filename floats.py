@@ -808,6 +808,11 @@ def fp_nextDown(op):
     # This is how it is defined in 5.3.1
     return -fp_nextUp(-op)
 
+def fp_from_ubv(eb, sb, rm, op):
+    rv = MPF(eb, sb)
+    rv.from_rational(rm, op.to_unsigned_int())
+    return rv
+
 def fp_to_ubv(op, rm, width):
     if op.isInfinite() or op.isNaN():
         raise Unspecified
@@ -820,6 +825,11 @@ def fp_to_ubv(op, rm, width):
         return bv
     else:
         raise Unspecified
+
+def fp_from_ubv(eb, sb, rm, op):
+    rv = MPF(eb, sb)
+    rv.from_rational(rm, op.to_signed_int())
+    return rv
 
 def fp_to_sbv(op, rm, width):
     if op.isInfinite() or op.isNaN():
