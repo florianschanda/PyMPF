@@ -540,7 +540,7 @@ def mk_tests_from_bitvector(num_tests):
                 return
             fudge = x.new_mpf()
             fudge.from_rational(vec["rounding"], shift)
-            x = fp_add(vec["rounding"], x, fudge)
+            x = fp_add(RM_RNE, x, fudge) # RNE is used on purpose
 
         try:
             if vec["ops"] == "fp.to.ubv":
@@ -561,11 +561,15 @@ def mk_tests_from_bitvector(num_tests):
 
         with new_test(vec) as fd:
             smt_write_header(fd, expectation, vec["comment"], "QF_FPBV")
+            if unspecified:
+                smt_write_comment(fd,
+                                  "This benchmark relies on partial functions.")
             smt_write_var(
                 fd,
                 var_name    = "x",
                 var_type    = x.smtlib_sort(),
-                assertion   = "(= x %s)" % x.smtlib_random_literal())
+                assertion   = "(= x %s)" % x.smtlib_random_literal(),
+                expectation = str(x))
             smt_write_var(
                 fd,
                 var_name    = "y",
@@ -578,13 +582,17 @@ def mk_tests_from_bitvector(num_tests):
                 expectation = y_expectation)
             if not unspecified or random.randint(0, 1) == 0:
                 z_assertion = "(= z %s)" % bv.smtlib_random_literal()
+                z_expectation = {"fp.to.ubv" : bv.to_unsigned_int(),
+                                 "fp.to.sbv" : bv.to_signed_int()}[vec["ops"]]
             else:
                 z_assertion = None
+                z_expectation = None
             smt_write_var(
                 fd,
                 var_name    = "z",
                 var_type    = bv.smtlib_sort(),
-                assertion   = z_assertion)
+                assertion   = z_assertion,
+                expectation = z_expectation)
             smt_write_goal(
                 fd,
                 bool_expr   = "(= y z)",

@@ -48,7 +48,10 @@ def smt_write_header(fd, status, comment=None, logic="QF_FP"):
     fd.write("(set-info :category random)\n")
     fd.write("(set-info :status %s)\n" % status)
     if comment is not None:
-        fd.write(";; %s\n" % comment)
+        smt_write_comment(fd, comment)
+
+def smt_write_comment(fd, comment):
+    fd.write(";; %s\n" % comment)
 
 def smt_write_footer(fd):
     fd.write("(check-sat)\n")
@@ -59,7 +62,7 @@ def smt_write_var(fd, var_name, var_type, assertion = None, expectation = None):
     if assertion is not None:
         fd.write("(assert %s)\n" % assertion)
     if expectation is not None:
-        fd.write(";; %s should be %s\n" % (var_name, expectation))
+        smt_write_comment(fd, "%s should be %s\n" % (var_name, expectation))
 
 def smt_write_vars(fd, test_vector):
     assert 1 <= len(test_vector["values"]) <= 3
