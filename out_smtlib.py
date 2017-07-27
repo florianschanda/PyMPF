@@ -72,7 +72,8 @@ def smt_write_vars(fd, test_vector):
         smt_write_var(fd,
                       var,
                       fp.smtlib_sort(),
-                      "(= %s %s)" % (var, fp.smtlib_random_literal()))
+                      "(= %s %s)" % (var, fp.smtlib_random_literal()),
+                      str(fp))
 
 def smt_write_goal(fd, bool_expr, expectation, correct_answer = True):
     assert expectation in ("sat", "unsat")
