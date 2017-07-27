@@ -54,22 +54,22 @@ class Interval(object):
     def __str__(self):
         rv = ""
         if self.low.kind == KIND_INFINITE:
-            rv += "]-oo"
+            rv += "] -oo"
         else:
             if self.low.kind == KIND_INCLUSIVE:
-                rv += "["
+                rv += "[ "
             else:
-                rv += "]"
+                rv += "] "
             rv += str(self.low.value)
-        rv += " "
+        rv += " .. "
         if self.high.kind == KIND_INFINITE:
-            rv += "+oo["
+            rv += "+oo ["
         else:
             rv += str(self.high.value)
             if self.high.kind == KIND_INCLUSIVE:
-                rv += "]"
+                rv += " ]"
             else:
-                rv += "["
+                rv += " ["
         return rv
 
     def set_low(self, q, inclusive):
