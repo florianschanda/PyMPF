@@ -848,61 +848,161 @@ def interval_nearest(rm, op):
     assert rm in MPF.ROUNDING_MODES_NEAREST
     assert not op.isNaN()
 
+    DEBUG_INTERVAL = False
+
+    if DEBUG_INTERVAL:
+        print "Interval query: %s [%s]" % (op, rm)
+
     interval = Interval()
+
+    op_is_even = (op.bv % 2) == 0
+    if DEBUG_INTERVAL:
+        if rm == RM_RNE:
+            print "> even? : %s" % op_is_even
 
     low  = fp_nextDown(op)
     high = fp_nextUp(op)
+    if DEBUG_INTERVAL:
+        print "> low  : %s" % low
+        print "> high : %s" % high
 
+    # Boundary for infinity, as described in IEEE 754 (Section 4.3.1)
+    #
+    # These is a question here as to what the standard really
+    # means. It says "an infinitely precise result with magnitude at
+    # least [...]"; now what does "at least" mean?
+    #
+    # I have chosen to interpret this as >=, instead of >.
     inf = q_pow2(op.emax) * \
           (Rational(2) - Rational(1, 2) * q_pow2(1 - op.p))
+    if DEBUG_INTERVAL:
+        print "> inf  : %s" % inf
 
-    favoured_even = op.bv % 2 == 0
-    # TODO: RNA should round to the largest magnitude
-
+    # Lets establish some basic bounds relevant to round-to-nearest
     #
-    # -oo ... -inf ... -maxnormal ... -0 +0 ... +maxnormal ... +inf ... +oo
+    #      nextdown(op) ... | ... op ... | ... nextup(op)
+    #                     q_low        q_high
     #
-
-    if op.isInfinite():
-        # Eliminate the infinite case: values at least inf round to
-        # infinity, so anything less will not.
-        if op.isNegative():
-            interval.set_high(-inf, inclusive=True)
-        else:
-            interval.set_low(inf, inclusive=True)
-    elif low.isInfinite() or high.isInfinite():
-        # We're just on the boundary, so we go from inf (exclusive) to the
-        # relevant value below.
-        if low.isInfinite():
-            q = (op.to_rational() + high.to_rational()) * Rational(1, 2)
-            interval.set_low(-inf, inclusive=False)
-            interval.set_high(q, inclusive=favoured)
-        else:
-            q = (op.to_rational() + low.to_rational()) * Rational(1, 2)
-            interval.set_low(q, inclusive=favoured)
-            interval.set_high(inf, inclusive=False)
-    elif op.isZero():
-        # Zero is again a bit special as we need to carefully deal with
-        # underflow.
-        q = high.to_rational() * Rational(1, 2)
-        if op.isNegative():
-            interval.set_low(-q, inclusive=favoured)
-            # 0 never rounds to -0
-            interval.set_high(Rational(0), inclusive=False)
-        else:
-            # 0 always rounds to +0
-            interval.set_low(Rational(0), inclusive=True)
-            interval.set_high(q, inclusive=favoured)
+    # If the rounding mode is RNE, then q_low and q_high are in the
+    # interval if op is even, and not in the interval if op is odd.
+    #
+    # If the rounding mode is RNA, then q_low is in the interval iff
+    # op is positive, and q_high is in the interval iff op is
+    # negative.
+    #
+    # We also need to special case 0 as it breaks intervals up:
+    #
+    #                   q_low           q_high
+    #         nextdown(0) | ... -0 +0 ... | ... nextup(0)
+    #
+    # RNA -0        q_low ]      [ q_high = 0
+    # RNE -0        q_low [      [ q_high = 0
+    # RNA +0             q_low = 0 [      [ q_high
+    # RNE +0             q_low = 0 [      ] q_high
+    #
+    # I.e. RNE is the same, except the non-zero low and high intervals
+    # are inclusive since 0 is even; this means we do not need to do
+    # anything special. The only special case is q_high for -0 and
+    # q_low for +0.
+    if op.isZero() and op.isNegative():
+        q_high = Rational(0)
+        high_inclusive = False
+    elif not (op.isInfinite() or high.isInfinite()):
+        q_high = (op.to_rational() + high.to_rational()) * Rational(1, 2)
+        high_inclusive = {RM_RNE : op_is_even,
+                          RM_RNA : op.isNegative()}[rm]
+    elif not op.isInfinite():
+        # We're on the boundary to infinity here
+        assert high.isInfinite() and high.isPositive()
+        q_high = inf
+        high_inclusive = False
+    elif op.isPositive():
+        assert op.isInfinite()
+        # We're +oo, so high bound does not exist
+        q_high = None
+        high_inclusive = True
     else:
-        assert low.isNegative() == op.isNegative()
-        assert op.isNegative() == high.isNegative()
-        # We're either side of zero now, and we don't have to worry about
-        # infinities.
-        q = (op.to_rational() + low.to_rational()) * Rational(1, 2)
-        interval.set_low(q, inclusive=favoured)
+        assert op.isNegative() and op.isInfinite()
+        # We're -oo, so high bound is inf
+        q_high = -inf
+        high_inclusive = True
 
-        q = (op.to_rational() + high.to_rational()) * Rational(1, 2)
-        interval.set_high(q, inclusive=favoured)
+    if DEBUG_INTERVAL:
+        print "> established high bound : %s %s" % (q_high,
+                                                    "inclusive"
+                                                    if high_inclusive
+                                                    else "")
+
+    # Sanity check that the interval does or does not convert back
+    if q_high is not None:
+        tmp = op.new_mpf()
+        tmp.from_rational(rm, q_high)
+        assert smtlib_eq(tmp, op) == high_inclusive
+
+    if op.isZero() and op.isPositive():
+        q_low = Rational(0)
+        low_inclusive = True
+    elif not (op.isInfinite() or low.isInfinite()):
+        q_low = (op.to_rational() + low.to_rational()) * Rational(1, 2)
+        low_inclusive = {RM_RNE : op_is_even,
+                         RM_RNA : op.isPositive()}[rm]
+    elif not op.isInfinite():
+        # We're on the boundary to infinity here
+        assert low.isInfinite() and low.isNegative()
+        q_low = -inf
+        low_inclusive = False
+    elif op.isNegative():
+        assert op.isInfinite()
+        # We're -oo, so low bound does not exist
+        q_low = None
+        low_inclusive = True
+    else:
+        assert op.isPositive() and op.isInfinite()
+        # We're +oo, so low bound is inf
+        q_low = inf
+        low_inclusive = True
+
+    if DEBUG_INTERVAL:
+        print "> established low bound  : %s %s" % (q_low,
+                                                    "inclusive"
+                                                    if low_inclusive
+                                                    else "")
+
+    # Sanity check that the interval does or does not convert back
+    if q_low is not None:
+        tmp = op.new_mpf()
+        tmp.from_rational(rm, q_low)
+        assert smtlib_eq(tmp, op) == low_inclusive
+
+    if DEBUG_INTERVAL:
+        tmp = ""
+        if low_inclusive:
+            tmp += "["
+        else:
+            tmp += "]"
+        tmp += " "
+        if q_low is None:
+            tmp += "-oo"
+        else:
+            tmp += str(q_low)
+        tmp += " .. "
+        if q_high is None:
+            tmp += "+oo"
+        else:
+            tmp += str(q_high)
+        tmp += " "
+        if high_inclusive:
+            tmp += "]"
+        else:
+            tmp += "["
+        print "> interval : %s" % tmp
+
+    if q_low is not None:
+        interval.set_low(q_low, low_inclusive)
+    if q_high is not None:
+        interval.set_high(q_high, high_inclusive)
+    if DEBUG_INTERVAL:
+        print "> interval : %s" % interval
 
     return interval
 
