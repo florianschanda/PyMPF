@@ -442,6 +442,9 @@ class MPF(object):
         else:
             return "(_ FloatingPoint %u %u)" % (self.w, self.p)
 
+    def smtlib_from_float(self):
+        return "(_ to_fp %u %u)" % (self.w, self.p)
+
     def smtlib_from_real(self):
         return "(_ to_fp %u %u)" % (self.w, self.p)
 
@@ -843,6 +846,27 @@ def fp_to_sbv(op, rm, width):
         return bv
     else:
         raise Unspecified
+
+# Convert op to (_ FloatingPoint eb sb) under rounding mode rm.
+#
+# IEEE-754 is a bit vague on what happens to zero in Section 4 (which
+# is where you land when you read 5.4.2), but in 6.3 it says it
+# doesn't change.
+def fp_from_float(eb, sb, rm, op):
+    rv = MPF(eb, sb)
+    if op.isNaN():
+        rv.set_nan()
+    elif op.isInfinite():
+        rv.set_infinite(int(op.isNegative()))
+    elif op.isZero():
+        rv.set_zero(int(op.isNegative()))
+    else:
+        rv.from_rational(rm, op.to_rational())
+    return rv
+
+##############################################################################
+# Interval stuff
+##############################################################################
 
 def interval_nearest(rm, op):
     assert rm in MPF.ROUNDING_MODES_NEAREST
