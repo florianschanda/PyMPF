@@ -468,7 +468,7 @@ def mk_tests_for_ternary(num_tests):
                            vec["expectation"])
             smt_write_footer(fd)
 
-def mk_tests_from_bitvector(num_tests):
+def mk_tests_conv_on_bitvector(num_tests):
     # convert signed and unsigned bitvector to float
     def mk_test_from(vec):
         assert vec["ops"] in ("fp.from.ubv", "fp.from.sbv")
@@ -622,7 +622,7 @@ def mk_tests_from_bitvector(num_tests):
             mk_test_to(vec, bv_width, shift=q_half)
             mk_test_to(vec, bv_width, shift=-q_half)
 
-def mk_tests_for_real_to_float(num_tests):
+def mk_tests_conv_on_real(num_tests):
     # We pick a random float; then determine the rational interval that would
     # round onto that float. we then select rationals from:
     #   - outisde that interval,
@@ -781,8 +781,8 @@ def main():
     if options.test_ternary >= 1:
         mk_tests_for_ternary(options.test_ternary)
     if options.test_conversion >= 1:
-        mk_tests_from_bitvector(options.test_conversion)
-        mk_tests_for_real_to_float(options.test_conversion)
+        mk_tests_conv_on_bitvector(options.test_conversion)
+        mk_tests_conv_on_real(options.test_conversion)
 
 if __name__ == "__main__":
     main()
