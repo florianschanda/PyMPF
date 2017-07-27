@@ -442,6 +442,9 @@ class MPF(object):
         else:
             return "(_ FloatingPoint %u %u)" % (self.w, self.p)
 
+    def smtlib_from_binary_interchange(self):
+        return "(_ to_fp %u %u)" % (self.w, self.p)
+
     def smtlib_from_float(self):
         return "(_ to_fp %u %u)" % (self.w, self.p)
 

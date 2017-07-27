@@ -603,12 +603,19 @@ def mk_tests_conv_on_bitvector(num_tests):
                                   else True))
             smt_write_footer(fd)
 
+    ######################################################################
+    # signed or unsigned --> float
+    ######################################################################
 
     for vec in gen_bv_vectors("fp.from.ubv", 1, num_tests):
         mk_test_from(vec)
 
     for vec in gen_bv_vectors("fp.from.sbv", 1, num_tests):
         mk_test_from(vec)
+
+    ######################################################################
+    # float --> signed or unsigned
+    ######################################################################
 
     q_half = Rational(1, 2)
     for vec in gen_vectors("fp.to.ubv", 1, num_tests):
@@ -622,6 +629,53 @@ def mk_tests_conv_on_bitvector(num_tests):
             mk_test_to(vec, bv_width)
             mk_test_to(vec, bv_width, shift=q_half)
             mk_test_to(vec, bv_width, shift=-q_half)
+
+    ######################################################################
+    # binary interchange --> float
+    ######################################################################
+
+    for vec in gen_vectors("fp.from.binary", 1, num_tests):
+        # We do the conversion both ways. First bitvector to float...
+        with new_test(vec) as fd:
+            y = vec["values"][0]
+            x = BitVector(y.k)
+            x.from_unsigned_int(y.bv)
+
+            smt_write_header(fd, vec["expectation"], vec["comment"], "QF_FPBV")
+            smt_write_comment(fd, "binary interchange -> float")
+            smt_write_var(fd, "x", x.smtlib_sort(),
+                          "(= x %s)" % x.smtlib_random_literal(),
+                          "%x" % x.to_unsigned_int())
+            smt_write_var(fd, "y", y.smtlib_sort(),
+                          "(= y (%s x))" % y.smtlib_from_binary_interchange(),
+                          str(y))
+            smt_write_goal(fd, "(= y %s)" % y.smtlib_literal(),
+                           vec["expectation"])
+            smt_write_footer(fd)
+
+        # Then from float to bitvector (we just need to be careful
+        # with the unspecified cast at NaN).
+        with new_test(vec) as fd:
+            x = vec["values"][0]
+            y = BitVector(x.k)
+            y.from_unsigned_int(x.bv)
+
+            unspecified = x.isNaN()
+            expectation = "sat" if unspecified else vec["expectation"]
+
+            smt_write_header(fd, expectation, vec["comment"], "QF_FPBV")
+            smt_write_comment(fd, "float -> binary interchange")
+            if unspecified:
+                smt_write_comment(fd,
+                                  "this test relies on unspecified functions")
+            smt_write_vars(fd, vec)
+
+            smt_write_var(fd, "y", y.smtlib_sort(),
+                          "(= (%s y) x)" % x.smtlib_from_binary_interchange(),
+                          y.smtlib_literal())
+            smt_write_goal(fd, "(= y %s)" % y.smtlib_literal(), expectation)
+            smt_write_footer(fd)
+
 
 def mk_tests_conv_on_real(num_tests):
     # We pick a random float; then determine the rational interval that would
