@@ -636,8 +636,6 @@ def mk_tests_for_real_to_float(num_tests):
         if x.isNaN():
             # This can't happen, so lets skip these
             continue
-        if vec["rounding"] != RM_RNA:
-            continue
 
         interval = fp_interval(vec["rounding"], x)
         if interval is None:
@@ -658,7 +656,7 @@ def mk_tests_for_real_to_float(num_tests):
                               "(= w (%s %s %s))" % (x.smtlib_from_real(),
                                                     vec["rounding"],
                                                     q.to_smtlib()),
-                              tmp.smtlib_literal())
+                              str(tmp))
                 smt_write_goal(fd,
                                "(%s x w)" % ("="
                                              if result
@@ -704,6 +702,44 @@ def mk_tests_for_real_to_float(num_tests):
             h = Interval_Bound(KIND_INFINITE)
             emit_test(random_rational(l, h), False, vec["expectation"], "above")
 
+        # Finally, we emit a test from a non-literal real to float. We
+        # do this by creating a real variable, asserting it lies in
+        # the interval we've worked out using < and <=, and converting
+        # to float.
+        with new_test(vec) as fd:
+            smt_write_header(fd, vec["expectation"],
+                             comment = "hard: non-literal interval check",
+                             logic   = "QF_FPLRA")
+            smt_write_vars(fd, vec)
+            bounds = []
+            if interval.low.kind == KIND_INCLUSIVE:
+                bounds.append("(>= r %s)" % interval.low.value.to_smtlib())
+            elif interval.low.kind == KIND_EXCLUSIVE:
+                bounds.append("(> r %s)" % interval.low.value.to_smtlib())
+            if interval.high.kind == KIND_INCLUSIVE:
+                bounds.append("(<= r %s)" % interval.high.value.to_smtlib())
+            elif interval.high.kind == KIND_EXCLUSIVE:
+                bounds.append("(< r %s)" % interval.high.value.to_smtlib())
+            if len(bounds) == 0:
+                bounds_assertion = None
+            elif len(bounds) == 1:
+                bounds_assertion = bounds[0]
+            else:
+                bounds_assertion = "(and %s)" % " ".join(bounds)
+            smt_write_var(fd,
+                          var_name = "r",
+                          var_type = "Real",
+                          assertion = bounds_assertion)
+
+            smt_write_var(fd, "w", x.smtlib_sort(),
+                          "(= w (%s %s r))" % (x.smtlib_from_real(),
+                                               vec["rounding"]))
+            smt_write_goal(fd,
+                           "(= x w)",
+                           vec["expectation"])
+            smt_write_footer(fd)
+
+
 def main():
     ap = argparse.ArgumentParser(
         description="Generate random SMTLIB testcases.",
@@ -746,8 +782,7 @@ def main():
         mk_tests_for_ternary(options.test_ternary)
     if options.test_conversion >= 1:
         mk_tests_from_bitvector(options.test_conversion)
-        # work in progress
-        # mk_tests_for_real_to_float(options.test_to_float)
+        mk_tests_for_real_to_float(options.test_conversion)
 
 if __name__ == "__main__":
     main()
