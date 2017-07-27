@@ -277,6 +277,7 @@ def gen_vectors(fp_ops, n, test_dup):
                         "expectation" : v_exp,
                         "values"      : v_val,
                         "comment"     : comment,
+                        "raw_kinds"   : text,
                     }
             k = n - 1
             while (k >= 0):
@@ -739,6 +740,45 @@ def mk_tests_conv_on_real(num_tests):
                            vec["expectation"])
             smt_write_footer(fd)
 
+def mk_tests_conv_on_float(num_tests):
+    # We pick a random float; then a bunch of target precisions
+    # (smaller and larger) and convert.
+    PRECISIONS = [(5, 11),
+                  (8, 24),
+                  (11, 53),
+                  (15, 113)]
+
+    for vec in gen_vectors("fp.cast", 1, num_tests):
+        src = vec["values"][0]
+        for target_eb, target_sb in PRECISIONS:
+            dst = fp_from_float(target_eb, target_sb, vec["rounding"], src)
+            if src.compatible(dst):
+                # Skip trivial casts
+                continue
+
+            vec["comment"] = ("%s conversion of %s(%s) -> %s" %
+                              (vec["rounding"],
+                               src.smtlib_sort(),
+                               vec["raw_kinds"][0],
+                               dst.smtlib_sort()))
+
+            with new_test(vec) as fd:
+                smt_write_header(fd, vec["expectation"], vec["comment"])
+
+                smt_write_vars(fd, vec)
+                smt_write_var(fd, "y",
+                              var_type  = dst.smtlib_sort(),
+                              assertion = ("(= y (%s %s %s))" %
+                                           (dst.smtlib_from_float(),
+                                            vec["rounding"],
+                                            "x")),
+                              expectation = str(dst))
+                smt_write_var(fd, "z",
+                              var_type = dst.smtlib_sort(),
+                              assertion = "(= z %s)" % dst.smtlib_random_literal(),
+                              expectation = "y")
+                smt_write_goal(fd, "(= y z)", vec["expectation"])
+                smt_write_footer(fd)
 
 def main():
     ap = argparse.ArgumentParser(
@@ -783,6 +823,7 @@ def main():
     if options.test_conversion >= 1:
         mk_tests_conv_on_bitvector(options.test_conversion)
         mk_tests_conv_on_real(options.test_conversion)
+        mk_tests_conv_on_float(options.test_conversion)
 
 if __name__ == "__main__":
     main()
