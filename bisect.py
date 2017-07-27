@@ -32,8 +32,8 @@
 
 class Bisect(object):
     def __init__(self, low, high):
-        assert type(low) is int
-        assert type(high) is int
+        assert type(low) is int or type(low) is long
+        assert type(high) is int or type(high) is long
         assert low <= high
 
         self.search_min = low
