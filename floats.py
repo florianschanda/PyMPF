@@ -457,6 +457,9 @@ class MPF(object):
     def smtlib_from_sbv(self):
         return "(_ to_fp %u %u)" % (self.w, self.p)
 
+    def smtlib_to_real(self):
+        return "fp.to_real"
+
     def smtlib_literals(self):
         choices = []
 

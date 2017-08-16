@@ -794,6 +794,85 @@ def mk_tests_conv_on_real(num_tests):
                            vec["expectation"])
             smt_write_footer(fd)
 
+    # For the float to real tests we can do two things.
+    #
+    # First we pick a random float and check that the to_real result
+    # matches our expectation.
+    #
+    # Secondly, we pick a real (based maybe on a float) and assert that a
+    # float converts to it.
+    for vec in gen_vectors("fp.to.real", 1, num_tests):
+        x = vec["values"][0]
+
+        unspecified = x.isNaN() or x.isInfinite()
+        if unspecified:
+            expectation = "sat"
+            logic       = "QF_UFFPLRA"
+            q           = Rational(random.randint(-2**64, 2**64),
+                                   random.randint(1, 2**32))
+        else:
+            expectation = vec["expectation"]
+            logic       = "QF_FPLRA"
+            q           = x.to_rational()
+
+        with new_test(vec) as fd:
+            smt_write_header(fd, expectation, logic=logic)
+            smt_write_vars(fd, vec)
+
+            if unspecified:
+                smt_write_comment(fd, "this relies on unspecified behaviour")
+            smt_write_var(fd,
+                          var_name    = "y",
+                          var_type    = "Real",
+                          assertion   = "(= y (%s x))" % x.smtlib_to_real(),
+                          expectation = str(q))
+
+            smt_write_goal(fd,
+                           bool_expr   = "(= y %s)" % q.to_smtlib(),
+                           expectation = expectation)
+
+            smt_write_footer(fd)
+
+        interval_unspecified = x.isNaN()
+        if interval_unspecified:
+            q = Rational(random.randint(-2**64, 2**64),
+                         random.randint(1, 2**32))
+        else:
+            interval = fp_interval(RM_RNA, x)
+            q = random_rational(interval.low, interval.high)
+
+        has_solution = x.isNaN() or x.isInfinite()
+        if not has_solution:
+            y = x.new_mpf()
+            for rm in MPF.ROUNDING_MODES:
+                y.from_rational(rm, q)
+                if y.isFinite() and y.to_rational() == q:
+                    has_solution = True
+                    break
+
+        if has_solution:
+            expectation = "sat"
+        else:
+            expectation = "unsat"
+
+        with new_test(vec) as fd:
+            smt_write_header(fd, expectation, logic=logic)
+            smt_write_var(fd,
+                          var_name = "x",
+                          var_type = x.smtlib_sort())
+            smt_write_var(fd,
+                          var_name = "y",
+                          var_type = "Real",
+                          assertion = "(= y (%s x))" % x.smtlib_to_real())
+            smt_write_var(fd,
+                          var_name = "z",
+                          var_type = "Real",
+                          assertion = "(= z %s)" % q.to_smtlib())
+
+            smt_write_goal(fd, "(= y z)", "sat") # The sat answer is fudged
+            smt_write_footer(fd)
+
+
 def mk_tests_conv_on_float(num_tests):
     # We pick a random float; then a bunch of target precisions
     # (smaller and larger) and convert.
