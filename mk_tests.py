@@ -382,6 +382,9 @@ def mk_tests_for_classify(num_tests):
 
 def mk_tests_for_unary(num_tests):
     for fp_ops in all_ops_where(arity=1, args=TYP_FLOAT, result=TYP_FLOAT):
+        if fp_ops == "fp.cast":
+            continue
+
         # pick x. compute op(x) = result. check result
         for vec in gen_vectors(fp_ops, 1, num_tests):
             x      = vec["values"][0]
