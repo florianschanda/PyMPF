@@ -199,7 +199,7 @@ FP_OPS = {
 def all_ops_where(arity = None, args = None, result = None):
     rv = set()
     for op in FP_OPS:
-        print op, FP_OPS[op], arity, args, result
+        #print op, FP_OPS[op], arity, args, result
         if arity is not None and arity != FP_OPS[op]["arity"]:
             continue
         if args is not None and args != FP_OPS[op]["args"]:
