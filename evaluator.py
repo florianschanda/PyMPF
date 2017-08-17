@@ -69,6 +69,14 @@ FP_OPS = {
                             "rnd"    : False,
                             "args"   : TYP_FLOAT,
                             "result" : TYP_FLOAT},
+    "fp.nextUp"          : {"arity"  : 1,
+                            "rnd"    : False,
+                            "args"   : TYP_FLOAT,
+                            "result" : TYP_FLOAT},
+    "fp.nextDown"        : {"arity"  : 1,
+                            "rnd"    : False,
+                            "args"   : TYP_FLOAT,
+                            "result" : TYP_FLOAT},
     "fp.sqrt"            : {"arity"  : 1,
                             "rnd"    : True,
                             "args"   : TYP_FLOAT,
@@ -102,6 +110,14 @@ FP_OPS = {
                             "args"   : TYP_FLOAT,
                             "result" : TYP_BOOL},
     "fp.isPositive"      : {"arity"  : 1,
+                            "rnd"    : False,
+                            "args"   : TYP_FLOAT,
+                            "result" : TYP_BOOL},
+    "fp.isFinite"        : {"arity"  : 1,
+                            "rnd"    : False,
+                            "args"   : TYP_FLOAT,
+                            "result" : TYP_BOOL},
+    "fp.isIntegral"      : {"arity"  : 1,
                             "rnd"    : False,
                             "args"   : TYP_FLOAT,
                             "result" : TYP_BOOL},
@@ -217,6 +233,7 @@ def is_rounding(fp_ops):
 ##############################################################################
 
 def c_write_header(fd):
+    fd.write("#define _GNU_SOURCE\n")
     fd.write("#include <stdio.h>\n")
     fd.write("#include <stdint.h>\n")
     fd.write("#include <mpfr.h>\n")
@@ -236,6 +253,18 @@ def c_write_header(fd):
     fd.write("  }\n")
     fd.write("}\n")
     fd.write("\n")
+
+    fd.write("void mpfr_nextUp(mpfr_t result, mpfr_t op1)\n")
+    fd.write("{\n")
+    fd.write("  mpfr_set(result, op1, MPFR_RNDN);\n")
+    fd.write("  mpfr_nextabove(result);\n")
+    fd.write("}\n\n")
+
+    fd.write("void mpfr_nextDown(mpfr_t result, mpfr_t op1)\n")
+    fd.write("{\n")
+    fd.write("  mpfr_set(result, op1, MPFR_RNDN);\n")
+    fd.write("  mpfr_nextbelow(result);\n")
+    fd.write("}\n\n")
 
     fd.write("int main(int argc, char **argv) {\n")
     fd.write("  int arg_id = 0;\n")
@@ -389,6 +418,8 @@ def fp_eval_predicate(fp_ops, *args):
         "fp.isNaN"       : lambda x: x.isNaN(),
         "fp.isNegative"  : lambda x: x.isNegative(),
         "fp.isPositive"  : lambda x: x.isPositive(),
+        "fp.isFinite"    : lambda x: x.isFinite(),
+        "fp.isIntegral"  : lambda x: x.isIntegral(),
         "fp.eq"          : lambda x, y: x == y,
         "fp.lt"          : lambda x, y: x < y,
         "fp.gt"          : lambda x, y: x > y,
@@ -425,6 +456,8 @@ def fp_eval_function(fp_ops, rm, *args):
     mpf_fn = {
         "fp.abs"             : lambda x: abs(x),
         "fp.neg"             : lambda x: -x,
+        "fp.nextUp"          : fp_nextUp,
+        "fp.nextDown"        : fp_nextDown,
         "fp.sqrt"            : fp_sqrt,
         "fp.roundToIntegral" : fp_roundToIntegral,
         "fp.add"             : fp_add,
@@ -451,6 +484,8 @@ def fp_eval_function(fp_ops, rm, *args):
         mpfr_fn = {
             "fp.abs"             : "mpfr_abs",
             "fp.neg"             : "mpfr_neg",
+            "fp.nextUp"          : "mpfr_nextUp",
+            "fp.nextDown"        : "mpfr_nextDown",
             "fp.sqrt"            : "mpfr_sqrt",
             "fp.roundToIntegral" : ("mpfr_round"
                                     if rm == RM_RNA
@@ -467,7 +502,11 @@ def fp_eval_function(fp_ops, rm, *args):
         mpfr_rounding  = True
         mpfr_rm        = (rm if op_rnd else RM_RNE)
         mpfr_supported = True
-        if rm == RM_RNA:
+        if fp_ops in ("fp.nextUp", "fp.nextDown"):
+            mpfr_rounding = False
+            mpfr_rm       = None
+            mpfr_supported = False
+        elif rm == RM_RNA:
             if fp_ops == "fp.roundToIntegral":
                 # We're using a special function here
                 mpfr_rounding = False
@@ -497,6 +536,8 @@ def fp_eval_function(fp_ops, rm, *args):
         c_fn = {
             "fp.abs"             : builtin("fabs"),
             "fp.neg"             : "(-%s__f)",
+            "fp.nextUp"          : "nextup%s(%%s__f)" % c_indicator,
+            "fp.nextDown"        : "nextdown%s(%%s__f)" % c_indicator,
             "fp.sqrt"            : builtin("sqrt"),
             "fp.roundToIntegral" : builtin("nearbyint"),
             "fp.add"             : "(%s__f + %s__f)",
@@ -519,7 +560,7 @@ def fp_eval_function(fp_ops, rm, *args):
                 c_supported = False
 
         # assert c_supported -> mpfr_supported
-        assert not c_supported or mpfr_supported
+        # assert (not c_supported) or mpfr_supported
 
         if mpfr_supported:
             # We do not yet have this program compiled...
