@@ -78,6 +78,10 @@ class Rational(object):
     def isIntegral(self):
         return (self.a % self.b) == 0
 
+    def to_python_int(self):
+        assert self.isIntegral()
+        return self.a
+
     def to_python_float(self):
         return float(self.a) / float(self.b)
 
