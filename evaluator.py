@@ -57,6 +57,7 @@ VALID_MPFR_ROUNDING_MODES = (RM_RNE, RM_RTP, RM_RTN, RM_RTZ)
 
 TYP_BOOL  = "boolean"
 TYP_FLOAT = "float"
+TYP_INT   = "int"
 TYP_REAL  = "real"
 TYP_BV    = "bitvector"
 
@@ -182,6 +183,10 @@ FP_OPS = {
                             "rnd"    : True,
                             "args"   : TYP_REAL,
                             "result" : TYP_FLOAT},
+    "fp.from.int"        : {"arity"  : 1,
+                            "rnd"    : True,
+                            "args"   : TYP_INT,
+                            "result" : TYP_FLOAT},
     "fp.from.ubv"        : {"arity"  : 1,
                             "rnd"    : True,
                             "args"   : TYP_BV,
@@ -198,6 +203,10 @@ FP_OPS = {
                             "rnd"    : False,
                             "args"   : TYP_FLOAT,
                             "result" : TYP_REAL},
+    "fp.to.int"          : {"arity"  : 1,
+                            "rnd"    : True,
+                            "args"   : TYP_FLOAT,
+                            "result" : TYP_INT},
     "fp.to.ubv"          : {"arity"  : 1,
                             "rnd"    : True,
                             "args"   : TYP_FLOAT,

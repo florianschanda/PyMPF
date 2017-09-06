@@ -130,7 +130,8 @@ def largest_normal(sign=0):
     return rv
 
 def random_halfpoint(sign=0):
-    # Returns something.5 which is great to test various tie-breaks
+    # Returns something.5 which is great to test various tie-breaks things
+    # involving integers.
     rv = MPF(8, 24)
     i = random.randint(0, 2 ** (rv.p - 1) - 1)
     rv.from_rational(RM_RNE, Rational(i * 2 + 1, 2))
@@ -338,6 +339,93 @@ def gen_bv_vectors(fp_ops, n, test_dup):
                                     "values"      : [bv],
                                     "comment"     : comment,
                                 }
+
+def gen_int_vectors(fp_ops, n, test_dup):
+    assert fp_ops == "fp.from.int"
+    assert n      == 1
+
+    vec = {
+        "ops"         : fp_ops,
+        "rounding"    : None,
+        "expectation" : None,
+        "values"      : None,
+        "mpf_fmt"     : None,
+        "comment"     : None,
+    }
+
+    constructors = ("zero",           # 0
+                    "precise_int",    # [1; 2^sb]
+                    "rounded_int",    # ]2^sb+1; inf[ (excluding halfpoints)
+                    "halfpoint_int",  # ]2^sb; inf[ (halfpoints)
+                    "inf_boundary",   # [inf; inf]
+                    "inf")            # ]inf; oo[
+
+    def mk_int_halfpoint(eb, sb, n):
+        assert n >= 2 ** sb
+        q = Rational(n)
+
+        f = MPF(eb, sb)
+        f.from_rational(RM_RTZ, q)
+        assert f.isIntegral()
+
+        q_1 = f.to_rational()
+        assert q_1.isIntegral()
+
+        g = fp_nextUp(f)
+        if g.isInfinite():
+            g = fp_nextDown(f)
+        assert g.isIntegral()
+
+        q_2 = g.to_rational()
+        assert q_2.isIntegral()
+
+        hp = (q_1 + q_2) * Rational(1, 2)
+        assert hp.isIntegral()
+
+        return hp.to_python_int()
+
+
+    for rm in gen_rm(fp_ops):
+        vec["rounding"] = rm
+
+        for eb, sb in [(8, 24), (11, 53)]:
+            vec["mpf_fmt"] = (eb, sb)
+            fmt            = MPF(eb, sb)
+            inf            = fmt.inf_boundary()
+
+            history = set()
+
+            for cls in constructors:
+                vec["comment"] = "(%s %s %s)" % (fp_ops, rm, cls)
+
+                for i in xrange(test_dup):
+                    vec["expectation"] = random.choice(["sat", "unsat"])
+                    vec["values"]      = None
+
+                    if cls == "zero":
+                        vec["values"] = 0
+                    elif cls == "precise_int":
+                        vec["values"] = random.randint(1, 2 ** sb)
+                    elif cls == "rounded_int":
+                        # 2 ^ sb .. 2 ^ sb + 1 are all halfpoints or exact
+                        n = random.randint((2 ** (sb + 1)) + 1, inf - 1)
+                        hp = mk_int_halfpoint(eb, sb, n)
+                        vec["values"] = n + random.choice([-1, 1])
+                    elif cls == "halfpoint_int":
+                        q = random.randint((2 ** sb) + 1, inf - 1)
+                        vec["values"] = mk_int_halfpoint(eb, sb, q)
+                    elif cls == "inf_boundary":
+                        vec["values"] = inf
+                    elif cls == "inf":
+                        vec["values"] = inf + random.randint(1, inf)
+                    assert vec["values"] is not None
+
+                    if random.choice([False, True]):
+                        vec["values"] = -vec["values"]
+
+                    if vec["values"] not in history:
+                        history.add(vec["values"])
+                        yield vec
 
 
 ##############################################################################
@@ -876,6 +964,84 @@ def mk_tests_conv_on_real(num_tests):
             smt_write_footer(fd)
 
 
+def mk_tests_conv_on_int(num_tests):
+    ######################################################################
+    # int -> float tests
+    #
+    # Currently:
+    # - we pick a random integer and convert it to float
+    #
+    # Todo:
+    # - pick two integers and say something about the interval
+    ######################################################################
+
+    def int_to_smtlib(n):
+        if n < 0:
+            return "(- %u)" % (- n)
+        else:
+            return "%u" % n
+
+    for vec in gen_int_vectors("fp.from.int", 1, num_tests):
+        f = MPF(*vec["mpf_fmt"])
+        f.from_rational(vec["rounding"], Rational(vec["values"]))
+
+        with new_test(vec) as fd:
+            smt_write_header(fd,
+                             vec["expectation"], vec["comment"],
+                             logic="QF_FPLIA")
+            smt_write_var(fd,
+                          var_name  = "x",
+                          var_type  = "Int",
+                          assertion = "(= x %s)" % int_to_smtlib(vec["values"]))
+            smt_write_var(fd,
+                          var_name    = "y",
+                          var_type    = f.smtlib_sort(),
+                          assertion   = "(= y (%s x))" % f.smtlib_from_int(),
+                          expectation = str(f))
+            smt_write_var(fd,
+                          var_name   = "z",
+                          var_type   = f.smtlib_sort(),
+                          assertion  = "(= z %s)" % f.smtlib_random_literal())
+            smt_write_goal(fd, "(= y z)", vec["expectation"])
+
+    ######################################################################
+    # float -> int tests
+    #
+    # Currently:
+    # - we pick a random float and convert it to int
+    ######################################################################
+
+    for vec in gen_vectors("fp.to.int", 1, num_tests):
+        x = vec["values"][0]
+
+        if x.isFinite():
+            n           = fp_to_int(vec["rounding"], x)
+            expectation = vec["expectation"]
+            ex_y        = "%i" % n
+            logic       = "QF_FPLIA"
+        else:
+            n           = random.randint(-2 * x.inf_boundary(),
+                                         x.inf_boundary())
+            expectation = "sat"
+            ex_y        = "unspecified"
+            logic       = "QF_UFFPLIA"
+
+        with new_test(vec) as fd:
+            smt_write_header(fd,
+                             expectation, vec["comment"], logic)
+            smt_write_vars(fd, vec)
+            smt_write_var(fd,
+                          var_name    = "y",
+                          var_type    = "Int",
+                          assertion   = "(= y (%s x))" % x.smtlib_to_int(),
+                          expectation = ex_y)
+            smt_write_var(fd,
+                          var_name  = "z",
+                          var_type  = "Int",
+                          assertion = "(= z %s)" % int_to_smtlib(n))
+            smt_write_goal(fd, "(= y z)", vec["expectation"])
+
+
 def mk_tests_conv_on_float(num_tests):
     # We pick a random float; then a bunch of target precisions
     # (smaller and larger) and convert.
@@ -960,6 +1126,7 @@ def main():
         mk_tests_conv_on_bitvector(options.test_conversion)
         mk_tests_conv_on_real(options.test_conversion)
         mk_tests_conv_on_float(options.test_conversion)
+        mk_tests_conv_on_int(options.test_conversion)
 
 if __name__ == "__main__":
     main()

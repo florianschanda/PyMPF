@@ -863,6 +863,21 @@ def fp_to_sbv(op, rm, width):
     else:
         raise Unspecified
 
+# ((_ to_fp eb sb) rm op)
+def fp_from_int(eb, sb, rm, op):
+    rv = MPF(eb, sb)
+    rv.from_rational(rm, Rational(op))
+    return rv
+
+# (fp.to_int rm op)
+def fp_to_int(rm, op):
+    if op.isInfinite() or op.isNaN():
+        raise Unspecified
+
+    n = op.to_rational()
+    q = q_round(rm, n)
+    return q.to_python_int()
+
 # Convert op to (_ FloatingPoint eb sb) under rounding mode rm.
 #
 # IEEE-754 is a bit vague on what happens to zero in Section 4 (which
