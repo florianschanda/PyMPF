@@ -845,7 +845,7 @@ def fp_to_ubv(op, rm, width):
     else:
         raise Unspecified
 
-def fp_from_ubv(eb, sb, rm, op):
+def fp_from_sbv(eb, sb, rm, op):
     rv = MPF(eb, sb)
     rv.from_rational(rm, op.to_signed_int())
     return rv
