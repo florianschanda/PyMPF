@@ -134,11 +134,15 @@ class MPF(object):
         else:
             return rv
 
+    def inf_boundary(self):
+        inf = q_pow2(self.emax) * \
+              (Rational(2) - Rational(1, 2) * q_pow2(1 - self.p))
+        return inf.to_python_int()
+
     def from_rational(self, rm, q):
         assert rm in MPF.ROUNDING_MODES
 
-        inf = q_pow2(self.emax) * \
-              (Rational(2) - Rational(1, 2) * q_pow2(1 - self.p))
+        inf = Rational(self.inf_boundary())
 
         target = abs(q)
         sign   = q.isNegative()
@@ -451,6 +455,9 @@ class MPF(object):
     def smtlib_from_real(self):
         return "(_ to_fp %u %u)" % (self.w, self.p)
 
+    def smtlib_from_int(self):
+        return "(_ to_fp %u %u)" % (self.w, self.p)
+
     def smtlib_from_ubv(self):
         return "(_ to_fp_unsigned %u %u)" % (self.w, self.p)
 
@@ -459,6 +466,9 @@ class MPF(object):
 
     def smtlib_to_real(self):
         return "fp.to_real"
+
+    def smtlib_to_int(self):
+        return "fp.to_int"
 
     def smtlib_literals(self):
         choices = []
@@ -903,8 +913,7 @@ def interval_nearest(rm, op):
     # least [...]"; now what does "at least" mean?
     #
     # I have chosen to interpret this as >=, instead of >.
-    inf = q_pow2(op.emax) * \
-          (Rational(2) - Rational(1, 2) * q_pow2(1 - op.p))
+    inf = Rational(op.inf_boundary())
     if DEBUG_INTERVAL:
         print "> inf  : %s" % inf
 
