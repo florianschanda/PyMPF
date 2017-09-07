@@ -272,7 +272,7 @@ def gen_expanded_bool_expressions(depth, num_vars, literals):
                         if tree_check_constraint(tmp_b):
                             yield tmp_b
 
-def check_status(timeout, *terms):
+def check_status(timeout, solver, *terms):
     def set_limit():
         resource.setrlimit(resource.RLIMIT_CPU, (timeout, timeout))
 
@@ -280,9 +280,7 @@ def check_status(timeout, *terms):
                       map(tree_get_vars, terms),
                       set())
 
-    p = subprocess.Popen(["../smtlib_schanda/cvc4_2017_08_18",
-                          "--check-models",
-                          "--lang=smt2"],
+    p = subprocess.Popen(solver,
                          stdin=subprocess.PIPE,
                          stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE,
@@ -310,19 +308,19 @@ def check_status(timeout, *terms):
     else:
         raise Exception(stdout + "\n" + stderr.strip())
 
-def process(goal):
+def process(task):
     timeout = 5
 
     rv = {"status" : None,
-          "term"   : goal}
+          "term"   : task["goal"]}
 
-    status_a = check_status(timeout, goal)
+    status_a = check_status(timeout, task["solver"], task["goal"])
     if status_a == "timeout":
         rv["status"] = "hard"
         return rv
 
-    not_goal = call("not", False, goal)
-    status_b = check_status(timeout, not_goal)
+    not_goal = call("not", False, task["goal"])
+    status_b = check_status(timeout, task["solver"], not_goal)
 
     if status_b == "timeout":
         rv["status"] = "hard"
@@ -340,7 +338,7 @@ def process(goal):
     return rv
 
 
-def mk_theorems(depth):
+def mk_theorems(depth, solver):
     os.mkdir("theorem.inst")
 
     literals = []
@@ -363,23 +361,24 @@ def mk_theorems(depth):
     term_generator = gen_expanded_bool_expressions(depth,
                                                    2,
                                                    literals)
-    terms = list(term_generator)
+    tasks = [{"solver" : solver,
+              "goal"   : x}
+             for x in term_generator]
 
     pool = multiprocessing.Pool()
 
-    i = 0
     n = 0
-    for result in pool.imap_unordered(process, terms, 10):
+    for result in pool.imap(process, tasks, 10):
         n += 1
         if result["status"] == "unsat":
             pass
             #print "Unsat:", pp_tree(result["term"])
 
         elif result["status"] == "hard":
-            print "<%.1f%%> Hard:" % (float(n*100)/len(terms)), pp_tree(result["term"])
+            print "<%.1f%%> Hard: %s" % (float(n*100)/len(terms),
+                                         pp_tree(result["term"]))
 
-            i += 1
-            with open("theorem.inst/hard_%08u.smt2" % i, "w") as fd:
+            with open("theorem.inst/hard_%08u.smt2" % n, "w") as fd:
                 smt_write_header(fd, "unknown")
                 all_vars = tree_get_vars(result["term"])
                 for v in all_vars:
@@ -392,13 +391,30 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--depth",
                     default=3)
+    ap.add_argument("--solver",
+                    default="cvc4",
+                    choices=["cvc4", "z3", "mathsat"])
     options = ap.parse_args()
 
     for d in glob("theorem.*"):
         if os.path.isdir(d):
             shutil.rmtree(d)
 
-    mk_theorems(options.depth)
+    if options.solver == "cvc4":
+        solver = ["../smtlib_schanda/cvc4_2017_08_18",
+                  "--lang=smt2",
+                  "--check-models"]
+    elif options.solver == "z3":
+        solver = ["../smtlib_schanda/z3_2017_08_02",
+                  "-smt2",
+                  "-in"]
+    elif options.solver == "mathsat":
+        solver = ["mathsat",
+                  "-input=smt2"]
+    else:
+        assert False
+
+    mk_theorems(options.depth, solver)
 
 if __name__ == "__main__":
     main()
