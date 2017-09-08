@@ -101,6 +101,7 @@ def tree_contains(n, predicate):
                 return True
     else:
         assert False
+    return False
 
 def tree_count(n, predicate):
     c = 0
