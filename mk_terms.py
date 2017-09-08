@@ -399,7 +399,7 @@ def mk_theorems(depth, solver, single_thread):
             #print "Unsat:", pp_tree(result["term"])
 
         elif result["status"] == "hard":
-            print "<%.1f%%> Hard: %s" % (float(n*100)/len(terms),
+            print "<%.1f%%> Hard: %s" % (float(n*100)/len(tasks),
                                          pp_tree(result["term"]))
 
             with open("theorem.inst/hard_%08u.smt2" % n, "w") as fd:
