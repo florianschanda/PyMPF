@@ -432,7 +432,7 @@ def main():
                   "--lang=smt2",
                   "--check-models"]
     elif options.solver == "z3":
-        solver = ["../smtlib_schanda/z3_2017_08_02",
+        solver = ["../smtlib_schanda/z3_2017_09_08",
                   "-smt2",
                   "-in"]
     elif options.solver == "mathsat":
