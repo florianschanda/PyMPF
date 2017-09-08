@@ -24,13 +24,14 @@
 
 # This program will generate a large number of random terms.
 
-import os
 import argparse
+import itertools
+import multiprocessing
+import os
+import resource
 import shutil
 import subprocess
-import resource
-import multiprocessing
-import itertools
+import tempfile
 from glob import glob
 from copy import copy
 
@@ -280,11 +281,7 @@ def check_status(timeout, solver, *terms):
                       map(tree_get_vars, terms),
                       set())
 
-    p = subprocess.Popen(solver,
-                         stdin=subprocess.PIPE,
-                         stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE,
-                         preexec_fn=set_limit)
+    need_tmp_file = "colibri" in solver[0]
 
     tmp = []
     tmp.append("(set-info :smt-lib-version 2.6)")
@@ -295,7 +292,27 @@ def check_status(timeout, solver, *terms):
         tmp.append("(assert %s)" % pp_tree(t))
     tmp.append("(check-sat)")
     tmp.append("(exit)")
-    stdout, stderr = p.communicate("\n".join(tmp) + "\n")
+
+    if need_tmp_file:
+        fd, fn = tempfile.mkstemp(".smt2", text=True)
+        for line in tmp:
+            os.write(fd, line + "\n")
+        os.close(fd)
+        cmd = copy(solver) + [fn]
+    else:
+        cmd = solver
+
+    p = subprocess.Popen(cmd,
+                         stdin=subprocess.PIPE,
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE,
+                         preexec_fn=set_limit)
+
+    if need_tmp_file:
+        stdout, stderr = p.communicate()
+        os.unlink(fn)
+    else:
+        stdout, stderr = p.communicate("\n".join(tmp) + "\n")
     stdout = stdout.strip()
     stderr = stderr.strip()
 
@@ -306,6 +323,7 @@ def check_status(timeout, solver, *terms):
     elif stdout == "" and stderr == "":
         return "timeout"
     else:
+        print "\n".join(tmp)
         raise Exception(stdout + "\n" + stderr.strip())
 
 def process(task):
@@ -338,7 +356,7 @@ def process(task):
     return rv
 
 
-def mk_theorems(depth, solver):
+def mk_theorems(depth, solver, single_thread):
     os.mkdir("theorem.inst")
 
     literals = []
@@ -365,10 +383,15 @@ def mk_theorems(depth, solver):
               "goal"   : x}
              for x in term_generator]
 
-    pool = multiprocessing.Pool()
+
+    if single_thread:
+        iterator = itertools.imap(process, tasks)
+    else:
+        pool = multiprocessing.Pool()
+        iterator = pool.imap(process, tasks, 10)
 
     n = 0
-    for result in pool.imap(process, tasks, 10):
+    for result in iterator:
         n += 1
         if result["status"] == "unsat":
             pass
@@ -393,7 +416,10 @@ def main():
                     default=3)
     ap.add_argument("--solver",
                     default="cvc4",
-                    choices=["cvc4", "z3", "mathsat"])
+                    choices=["cvc4", "z3", "mathsat", "colibri"])
+    ap.add_argument("--single",
+                    default=False,
+                    action="store_true")
     options = ap.parse_args()
 
     for d in glob("theorem.*"):
@@ -411,10 +437,12 @@ def main():
     elif options.solver == "mathsat":
         solver = ["mathsat",
                   "-input=smt2"]
+    elif options.solver == "colibri":
+        solver = ["colibri"]
     else:
         assert False
 
-    mk_theorems(options.depth, solver)
+    mk_theorems(options.depth, solver, options.single)
 
 if __name__ == "__main__":
     main()
