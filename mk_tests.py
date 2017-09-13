@@ -885,15 +885,22 @@ def mk_tests_conv_on_real(num_tests):
                            vec["expectation"])
             smt_write_footer(fd)
 
-    # For the float to real tests we can do two things.
+    # For the float to real tests we can a bunch of things.
     #
-    # First we pick a random float and check that the to_real result
-    # matches our expectation.
+    # First we pick a random float based on our usual selection
+    # criteria. Then:
     #
-    # Secondly, we pick a real (based maybe on a float) and assert that a
-    # float converts to it.
+    # (1) Assert float, and convert to real. Check expecation. If the
+    #     float is NaN or Inf then the problem is always SAT.
+    #
+    # (2) Pick a real based on the float. Either its precise value, or
+    #     (50% of the time) something close. Assert the real and
+    #     assert the float converts to it. Sometimes assert the float
+    #     is finite to rule out the obvious sat stuff for INF and NaN.
     for vec in gen_vectors("fp.to.real", 1, num_tests):
         x = vec["values"][0]
+
+        # (1)
 
         unspecified = x.isNaN() or x.isInfinite()
         if unspecified:
@@ -924,24 +931,52 @@ def mk_tests_conv_on_real(num_tests):
 
             smt_write_footer(fd)
 
-        interval_unspecified = x.isNaN()
+        # (2)
+
+        interval_unspecified = x.isNaN() or x.isInfinite()
         if interval_unspecified:
+            logic              = "QF_UFFPLRA"
+            is_sat             = True
+            assert_x_is_finite = False
+            assert_x_distinct  = False
             q = Rational(random.randint(-2**64, 2**64),
                          random.randint(1, 2**32))
+            comment_z = "a random rational"
         else:
-            interval = fp_interval(RM_RNA, x)
-            q = random_rational(interval.low, interval.high)
+            is_sat = vec["expectation"] == "sat"
+            is_rep = random.choice([False, True])
+            if is_sat:
+                # To make it sat, we have have two choices: a) make the
+                # real representable, or b) make sure that we do not make
+                # x finite.
+                if is_rep:
+                    logic              = "QF_FPLRA"
+                    assert_x_is_finite = random.choice([False, True])
+                else:
+                    logic              = "QF_UFFPLRA"
+                    assert_x_is_finite = False
+                assert_x_distinct  = False
+            else:
+                # To make it unsat we definitely need to make x
+                # finite. We can then either pick a non-rep real, or
+                # we can assert its a distinct from the correct
+                # answer.
+                logic              = "QF_FPLRA"
+                assert_x_is_finite = True
+                assert_x_distinct  = is_rep
 
-        has_solution = x.isNaN() or x.isInfinite()
-        if not has_solution:
-            y = x.new_mpf()
-            for rm in MPF.ROUNDING_MODES:
-                y.from_rational(rm, q)
-                if y.isFinite() and y.to_rational() == q:
-                    has_solution = True
-                    break
+            if is_rep:
+                q = x.to_rational()
+                comment_z = "a representable real"
+            else:
+                interval = fp_interval(RM_RNA, x)
+                while True:
+                    q = random_rational(interval.low, interval.high)
+                    if q != x.to_rational():
+                        break
+                comment_z = "a non-representable real"
 
-        if has_solution:
+        if is_sat:
             expectation = "sat"
         else:
             expectation = "unsat"
@@ -951,14 +986,22 @@ def mk_tests_conv_on_real(num_tests):
             smt_write_var(fd,
                           var_name = "x",
                           var_type = x.smtlib_sort())
+            if assert_x_is_finite:
+                smt_write_assertion(fd,
+                                    "(or (fp.isZero x) (fp.isSubnormal x) (fp.isNormal x))")
+            if assert_x_distinct:
+                smt_write_assertion(fd, "(distinct x %s)" % x.smtlib_random_literal())
+
             smt_write_var(fd,
                           var_name = "y",
                           var_type = "Real",
                           assertion = "(= y (%s x))" % x.smtlib_to_real())
+
             smt_write_var(fd,
                           var_name = "z",
                           var_type = "Real",
-                          assertion = "(= z %s)" % q.to_smtlib())
+                          assertion = "(= z %s)" % q.to_smtlib(),
+                          expectation = comment_z)
 
             smt_write_goal(fd, "(= y z)", "sat") # The sat answer is fudged
             smt_write_footer(fd)

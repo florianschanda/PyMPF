@@ -57,10 +57,13 @@ def smt_write_footer(fd):
     fd.write("(check-sat)\n")
     fd.write("(exit)\n")
 
-def smt_write_var(fd, var_name, var_type, assertion = None, expectation = None):
-    fd.write("(declare-const %s %s)\n" % (var_name, var_type))
+def smt_write_assertion(fd, assertion):
     if assertion is not None:
         fd.write("(assert %s)\n" % assertion)
+
+def smt_write_var(fd, var_name, var_type, assertion = None, expectation = None):
+    fd.write("(declare-const %s %s)\n" % (var_name, var_type))
+    smt_write_assertion(fd, assertion)
     if expectation is not None:
         smt_write_comment(fd, "%s should be %s\n" % (var_name, expectation))
 
