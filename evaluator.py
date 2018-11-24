@@ -4,6 +4,7 @@
 ##                                PYMPF                                     ##
 ##                                                                          ##
 ##              Copyright (C) 2016-2017, Altran UK Limited                  ##
+##              Copyright (C) 2018,      Florian Schanda                    ##
 ##                                                                          ##
 ##  This file is part of PyMPF.                                             ##
 ##                                                                          ##
@@ -37,7 +38,7 @@ import os
 import sys
 import subprocess
 
-from floats import *
+from mpf.floats import *
 
 GCC_FLAGS = " ".join(["-std=c99",
                       "-msse2",
@@ -55,187 +56,21 @@ GCC_FLAGS = " ".join(["-std=c99",
 
 VALID_MPFR_ROUNDING_MODES = (RM_RNE, RM_RTP, RM_RTN, RM_RTZ)
 
-TYP_BOOL  = "boolean"
-TYP_FLOAT = "float"
-TYP_INT   = "int"
-TYP_REAL  = "real"
-TYP_BV    = "bitvector"
-
-FP_OPS = {
-    "fp.abs"             : {"arity"  : 1,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_FLOAT},
-    "fp.neg"             : {"arity"  : 1,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_FLOAT},
-    "fp.nextUp"          : {"arity"  : 1,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_FLOAT},
-    "fp.nextDown"        : {"arity"  : 1,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_FLOAT},
-    "fp.sqrt"            : {"arity"  : 1,
-                            "rnd"    : True,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_FLOAT},
-    "fp.roundToIntegral" : {"arity"  : 1,
-                            "rnd"    : True,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_FLOAT},
-    "fp.isNormal"        : {"arity"  : 1,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BOOL},
-    "fp.isSubnormal"     : {"arity"  : 1,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BOOL},
-    "fp.isZero"          : {"arity"  : 1,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BOOL},
-    "fp.isInfinite"      : {"arity"  : 1,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BOOL},
-    "fp.isNaN"           : {"arity"  : 1,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BOOL},
-    "fp.isNegative"      : {"arity"  : 1,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BOOL},
-    "fp.isPositive"      : {"arity"  : 1,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BOOL},
-    "fp.isFinite"        : {"arity"  : 1,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BOOL},
-    "fp.isIntegral"      : {"arity"  : 1,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BOOL},
-    "fp.add"             : {"arity"  : 2,
-                            "rnd"    : True,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_FLOAT},
-    "fp.sub"             : {"arity"  : 2,
-                            "rnd"    : True,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_FLOAT},
-    "fp.mul"             : {"arity"  : 2,
-                            "rnd"    : True,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_FLOAT},
-    "fp.div"             : {"arity"  : 2,
-                            "rnd"    : True,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_FLOAT},
-    "fp.rem"             : {"arity"  : 2,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_FLOAT},
-    "fp.min"             : {"arity"  : 2,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_FLOAT},
-    "fp.max"             : {"arity"  : 2,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_FLOAT},
-    "fp.eq"              : {"arity"  : 2,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BOOL},
-    "fp.lt"              : {"arity"  : 2,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BOOL},
-    "fp.gt"              : {"arity"  : 2,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BOOL},
-    "fp.leq"             : {"arity"  : 2,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BOOL},
-    "fp.geq"             : {"arity"  : 2,
-                            "rnd"    : False,
-                            "result" : TYP_BOOL,
-                            "args"   : TYP_FLOAT},
-    "fp.fma"             : {"arity"  : 3,
-                            "rnd"    : True,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_FLOAT},
-    # Pseudo ops
-    "smtlib.eq"          : {"arity"  : 2,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BOOL},
-    "fp.from.real"       : {"arity"  : 1,
-                            "rnd"    : True,
-                            "args"   : TYP_REAL,
-                            "result" : TYP_FLOAT},
-    "fp.from.int"        : {"arity"  : 1,
-                            "rnd"    : True,
-                            "args"   : TYP_INT,
-                            "result" : TYP_FLOAT},
-    "fp.from.ubv"        : {"arity"  : 1,
-                            "rnd"    : True,
-                            "args"   : TYP_BV,
-                            "result" : TYP_FLOAT},
-    "fp.from.sbv"        : {"arity"  : 1,
-                            "rnd"    : True,
-                            "args"   : TYP_BV,
-                            "result" : TYP_FLOAT},
-    "fp.from.binary"     : {"arity"  : 1,
-                            "rnd"    : False,
-                            "args"   : TYP_BV,
-                            "result" : TYP_FLOAT},
-    "fp.to.real"         : {"arity"  : 1,
-                            "rnd"    : False,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_REAL},
-    "fp.to.int"          : {"arity"  : 1,
-                            "rnd"    : True,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_INT},
-    "fp.to.ubv"          : {"arity"  : 1,
-                            "rnd"    : True,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BV},
-    "fp.to.sbv"          : {"arity"  : 1,
-                            "rnd"    : True,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_BV},
-    "fp.cast"            : {"arity"  : 1,
-                            "rnd"    : True,
-                            "args"   : TYP_FLOAT,
-                            "result" : TYP_FLOAT},
-}
-
 def all_ops_where(arity = None, args = None, result = None):
     rv = set()
     for op in FP_OPS:
         #print op, FP_OPS[op], arity, args, result
-        if arity is not None and arity != FP_OPS[op]["arity"]:
+        if arity is not None and arity != FP_OPS[op].arity:
             continue
-        if args is not None and args != FP_OPS[op]["args"]:
+        if args is not None and args != FP_OPS[op].args_type:
             continue
-        if result is not None and result != FP_OPS[op]["result"]:
+        if result is not None and result != FP_OPS[op].result_type:
             continue
         rv.add(op)
     return rv
 
 def is_rounding(fp_ops):
-    return FP_OPS[fp_ops]["rnd"]
+    return FP_OPS[fp_ops].rm_arg
 
 ##############################################################################
 # Writing C
@@ -412,9 +247,9 @@ def c_run(x_file, *fp_args):
 
 def fp_eval_predicate(fp_ops, *args):
     assert fp_ops in FP_OPS
-    op_arity = FP_OPS[fp_ops]["arity"]
-    op_rnd   = FP_OPS[fp_ops]["rnd"]
-    op_rt    = FP_OPS[fp_ops]["result"]
+    op_arity = FP_OPS[fp_ops].arity
+    op_rnd   = FP_OPS[fp_ops].rm_arg
+    op_rt    = FP_OPS[fp_ops].result_type
     assert op_rt == TYP_BOOL
     assert op_arity == len(args)
     assert not op_rnd
@@ -443,9 +278,9 @@ FP_EVALUATION_PROGRAMS = {}
 
 def fp_eval_function(fp_ops, rm, *args):
     assert fp_ops in FP_OPS
-    op_arity = FP_OPS[fp_ops]["arity"]
-    op_rnd   = FP_OPS[fp_ops]["rnd"]
-    op_rt    = FP_OPS[fp_ops]["result"]
+    op_arity = FP_OPS[fp_ops].arity
+    op_rnd   = FP_OPS[fp_ops].rm_arg
+    op_rt    = FP_OPS[fp_ops].result_type
     assert op_rt == TYP_FLOAT
     assert op_arity == len(args)
     assert not op_rnd or rm in MPF.ROUNDING_MODES

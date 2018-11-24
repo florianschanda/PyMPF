@@ -4,6 +4,7 @@
 ##                                PYMPF                                     ##
 ##                                                                          ##
 ##              Copyright (C) 2016-2017, Altran UK Limited                  ##
+##              Copyright (C) 2018,      Florian Schanda                    ##
 ##                                                                          ##
 ##  This file is part of PyMPF.                                             ##
 ##                                                                          ##
@@ -1133,3 +1134,128 @@ def fp_interval(rm, op):
         RM_RTN: interval_down,
         RM_RTZ: (interval_up if op.isNegative() else interval_down),
     }[rm](rm, op)
+
+##############################################################################
+# SMTLIB Operations
+##############################################################################
+
+TYP_BOOL  = "boolean"
+TYP_FLOAT = "float"
+TYP_INT   = "int"
+TYP_REAL  = "real"
+TYP_BV    = "bitvector"
+
+class Floating_Point_Operation(object):
+    def __init__(self,
+                 name,
+                 arity,
+                 result_type=TYP_FLOAT,
+                 args_type=TYP_FLOAT,
+                 rm_arg=True,
+                 precision_arg=False):
+        self.name          = name
+        self.arity         = arity
+        self.result_type   = result_type
+        self.args_type     = args_type
+        self.rm_arg        = rm_arg
+        self.precision_arg = precision_arg
+
+class Floating_Point_Predicate(Floating_Point_Operation):
+    def __init__(self,
+                 name,
+                 arity,
+                 result_type=TYP_BOOL,
+                 args_type=TYP_FLOAT,
+                 rm_arg=False,
+                 precision_arg=False):
+        super(Floating_Point_Predicate, self).__init__(name,
+                                                       arity,
+                                                       result_type,
+                                                       args_type,
+                                                       rm_arg,
+                                                       precision_arg)
+
+FP_OPS = {
+    # Basic operations
+    "fp.abs"             : Floating_Point_Operation("fp.abs",
+                                                    1, rm_arg=False),
+    "fp.neg"             : Floating_Point_Operation("fp.neg",
+                                                    1, rm_arg=False),
+    "fp.sqrt"            : Floating_Point_Operation("fp.sqrt", 1),
+    "fp.roundToIntegral" : Floating_Point_Operation("fp.roundToIntegral", 1),
+    "fp.add"             : Floating_Point_Operation("fp.add", 2),
+    "fp.sub"             : Floating_Point_Operation("fp.sub", 2),
+    "fp.mul"             : Floating_Point_Operation("fp.mul", 2),
+    "fp.div"             : Floating_Point_Operation("fp.div", 2),
+    "fp.rem"             : Floating_Point_Operation("fp.rem", 2, rm_arg=False),
+    "fp.min"             : Floating_Point_Operation("fp.min", 2, rm_arg=False),
+    "fp.max"             : Floating_Point_Operation("fp.max", 2, rm_arg=False),
+    "fp.fma"             : Floating_Point_Operation("fp.fma", 3),
+
+    # Predicates
+    "fp.isNormal"        : Floating_Point_Predicate("fp.isNormal", 1),
+    "fp.isSubnormal"     : Floating_Point_Predicate("fp.isSubnormal", 1),
+    "fp.isZero"          : Floating_Point_Predicate("fp.isZero", 1),
+    "fp.isInfinite"      : Floating_Point_Predicate("fp.isInfinite", 1),
+    "fp.isNaN"           : Floating_Point_Predicate("fp.isNaN", 1),
+    "fp.isPositive"      : Floating_Point_Predicate("fp.isPositive", 1),
+    "fp.isNegative"      : Floating_Point_Predicate("fp.isNegative", 1),
+    "fp.eq"              : Floating_Point_Predicate("fp.eq", 2),
+    "fp.lt"              : Floating_Point_Predicate("fp.lt", 2),
+    "fp.gt"              : Floating_Point_Predicate("fp.gt", 2),
+    "fp.leq"             : Floating_Point_Predicate("fp.leq", 2),
+    "fp.geq"             : Floating_Point_Predicate("fp.geq", 2),
+    "smtlib.eq"          : Floating_Point_Predicate("=", 2),
+
+    # Conversion to float
+    "fp.from.real"       : Floating_Point_Operation("to_fp",
+                                                    1,
+                                                    args_type=TYP_REAL,
+                                                    precision_arg=True),
+    "fp.from.int"        : Floating_Point_Operation("to_fp",
+                                                    1,
+                                                    args_type=TYP_INT,
+                                                    precision_arg=True),
+    "fp.from.ubv"        : Floating_Point_Operation("to_fp_unsigned",
+                                                    1,
+                                                    args_type=TYP_BV,
+                                                    precision_arg=True),
+    "fp.from.sbv"        : Floating_Point_Operation("to_fp",
+                                                    1,
+                                                    args_type=TYP_BV,
+                                                    precision_arg=True),
+    "fp.from.binary"     : Floating_Point_Operation("to_fp",
+                                                    1,
+                                                    args_type=TYP_BV,
+                                                    rm_arg=False,
+                                                    precision_arg=True),
+
+    # Conversion from float to float
+    "fp.cast"            : Floating_Point_Operation("to_fp",
+                                                    1,
+                                                    precision_arg=True),
+
+    # Conversion to other types
+    "fp.to.real"         : Floating_Point_Operation("fp.to_real",
+                                                    1,
+                                                    result_type=TYP_REAL,
+                                                    rm_arg=False),
+    "fp.to.int"          : Floating_Point_Operation("fp.to_int",
+                                                    1,
+                                                    result_type=TYP_INT,
+                                                    rm_arg=False),
+    "fp.to.ubv"          : Floating_Point_Operation("fp.to_ubv",
+                                                    1,
+                                                    result_type=TYP_BV),
+    "fp.to.sbv"          : Floating_Point_Operation("fp.to_sbv",
+                                                    1,
+                                                    result_type=TYP_BV),
+
+    # Proposed extensions
+    "fp.isFinite"        : Floating_Point_Predicate("fp.isFinite", 1),
+    "fp.isIntegral"      : Floating_Point_Predicate("fp.isIntegral", 1),
+    "fp.nextUp"          : Floating_Point_Operation("fp.nextUp",
+                                                    1, rm_arg=False),
+    "fp.nextDown"        : Floating_Point_Operation("fp.nextDown",
+                                                    1, rm_arg=False),
+}

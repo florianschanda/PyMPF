@@ -4,6 +4,7 @@
 ##                                PYMPF                                     ##
 ##                                                                          ##
 ##              Copyright (C) 2016-2017, Altran UK Limited                  ##
+##              Copyright (C) 2018,      Florian Schanda                    ##
 ##                                                                          ##
 ##  This file is part of PyMPF.                                             ##
 ##                                                                          ##
@@ -30,10 +31,10 @@ import random
 import argparse
 from glob import glob
 
-from bitvector import *
-from floats import *
-from rationals import *
-from interval_q import *
+from mpf.bitvector import *
+from mpf.floats import *
+from mpf.rationals import *
+from mpf.interval_q import *
 from evaluator import (fp_eval_predicate,
                        fp_eval_function,
                        is_rounding,

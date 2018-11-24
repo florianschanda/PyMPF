@@ -4,6 +4,7 @@
 ##                                PYMPF                                     ##
 ##                                                                          ##
 ##              Copyright (C) 2017, Altran UK Limited                       ##
+##              Copyright (C) 2018, Florian Schanda                         ##
 ##                                                                          ##
 ##  This file is part of PyMPF.                                             ##
 ##                                                                          ##
@@ -32,6 +33,9 @@ class BitVector(object):
         self.max_unsigned = 2 ** width - 1
         self.min_signed = - (2 ** (width - 1))
         self.max_signed = 2 ** (width - 1) - 1
+
+    def __str__(self):
+        return self.smtlib_literal()
 
     ######################################################################
     # Setters
