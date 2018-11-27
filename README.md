@@ -5,8 +5,11 @@ This project contains two things:
 
 The main motivation is the test-case generation, so a number of things
 might seem a bit strange. This library has a bunch of limitations and
-should never be used if you want things to be fast. MPFR or Z3's MPF
-library are what you want.
+should never be used if you want things to be fast. Depending on what
+you want the following libraries are much better:
+  - SymFPU (if you want to reason about float in your SMT solver)
+  - Z3 MPF (ditto, but has much more dependencies)
+  - MPFR (if you just need arbitrary precision FP in your program)
 
 Why "yet another" implementation?
   - This library supports RNA (MPFR does not)
@@ -15,11 +18,12 @@ Why "yet another" implementation?
   - This library is done completely in Python unlike gmpy, mpmath, etc.
   - This library cross-checks with MPFR when possible (rm is not RNA)
   - This library cross-checks with compiled code when possible (precision is single or double, and rm is not RNA)
-  - This library is an independent implementation so can be used to check Z3/CVC4
+  - This library is an independent implementation so can be used to check SMT solvers such as CVC4, Z3, MathSAT, SONOLAR, Colibri, etc.
   - This library uses a stupid but simple algorithm to do rounding
 
 ## The testcase generator
-This has found real bugs in CVC4, Z3, and MathSAT. I will use this to
+This has found real bugs in all solvers we have tried (CVC4, Z3,
+MathSAT, Colibri, Alt-Ergo, goSAT, xsat, SONOLAR). I will use this to
 submit benchmarks to the SMTLIB competition.
 
 ### Result tests
@@ -48,5 +52,6 @@ multiple tests exporing all interesting points:
   - Something inside
 
 # License and Copyright
-Everything in this repository is licensed under the GNU GPL v3.
-All code is written by Florian Schanda and is :copyright: Altran UK Limited.
+Everything in this repository is licensed under the GNU GPL v3.  All
+code is written by Florian Schanda and is :copyright: Altran UK
+Limited and :copyright: Florian Schanda (as documented in each file).
