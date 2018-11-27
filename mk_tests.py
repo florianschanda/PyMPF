@@ -261,7 +261,17 @@ def gen_vectors(fp_ops, n, test_dup):
         classes = [0] * n
         while True:
             text = map(lambda x: TARGETS[x], classes)
-            for _ in xrange(test_dup):
+            for test_index in xrange(test_dup):
+                # Seed each test the same way, so that when we
+                # re-build tests with new constructors, the existing
+                # ones don't change.
+                #
+                # TODO: Add a command-line flag to change the core
+                # seed.
+                seed_str = "__".join(text + [str(test_index)])
+                random.seed(seed_str)
+
+                # Create test.
                 v_exp = random.choice(["sat", "unsat"])
                 v_val = map(mk_float, classes)
                 h     = tuple([v_exp] + [rm] + map(lambda x: x.bv, v_val))
@@ -281,6 +291,8 @@ def gen_vectors(fp_ops, n, test_dup):
                         "comment"     : comment,
                         "raw_kinds"   : text,
                     }
+
+            # Select the next class of test to produce.
             k = n - 1
             while (k >= 0):
                 if classes[k] < (N_TARGETS - 1):
