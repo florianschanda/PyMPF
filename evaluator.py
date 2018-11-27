@@ -320,63 +320,89 @@ def fp_eval_function(fp_ops, rm, *args):
         results["MPF"] = mpf_fn(*args)
 
     # Next we check C and MPFR results
+
+    # Set name of the program we use to evaluate
     prog_name = "eval__" + fp_ops
     if op_rnd:
         prog_name += "__" + rm.lower()
 
-    if prog_name not in FP_EVALUATION_PROGRAMS:
-        mpfr_fn = {
-            "fp.abs"             : "mpfr_abs",
-            "fp.neg"             : "mpfr_neg",
-            "fp.nextUp"          : "mpfr_nextUp",
-            "fp.nextDown"        : "mpfr_nextDown",
-            "fp.sqrt"            : "mpfr_sqrt",
-            "fp.roundToIntegral" : ("mpfr_round"
-                                    if rm == RM_RNA
-                                    else "mpfr_rint"),
-            "fp.add"             : "mpfr_add",
-            "fp.sub"             : "mpfr_sub",
-            "fp.mul"             : "mpfr_mul",
-            "fp.div"             : "mpfr_div",
-            "fp.rem"             : "mpfr_remainder",
-            "fp.min"             : "mpfr_min",
-            "fp.max"             : "mpfr_max",
-            "fp.fma"             : "mpfr_fma",
-        }[fp_ops]
-        mpfr_rounding  = True
-        mpfr_rm        = (rm if op_rnd else RM_RNE)
-        mpfr_supported = True
-        if fp_ops in ("fp.nextUp", "fp.nextDown"):
+    # Check if we can do this in C on native hardware
+    if precision_eb == 8 and precision_sb == 24:
+        c_type      = "float"
+        c_supported = True
+        c_indicator = "f"
+    elif precision_eb == 11 and precision_sb == 53:
+        c_type      = "double"
+        c_supported = True
+        c_indicator = ""
+    else:
+        c_type      = None
+        c_supported = False
+        c_indicator = ""
+    c_rounding = op_rnd
+    c_rm       = rm
+    if rm == RM_RNA:
+        if fp_ops == "fp.sqrt":
+            # RNE and RNA do the same, see Theorem 19 in HoFPA
+            c_rm = RM_RNE
+        else:
+            # Otherwise, this operation is not supported by any
+            # hardware we could find.
+            c_supported = False
+
+    # Check if we can do this using MPFR
+    mpfr_fn = {
+        "fp.abs"             : "mpfr_abs",
+        "fp.neg"             : "mpfr_neg",
+        "fp.nextUp"          : "mpfr_nextUp",
+        "fp.nextDown"        : "mpfr_nextDown",
+        "fp.sqrt"            : "mpfr_sqrt",
+        "fp.roundToIntegral" : ("mpfr_round"
+                                if rm == RM_RNA
+                                else "mpfr_rint"),
+        "fp.add"             : "mpfr_add",
+        "fp.sub"             : "mpfr_sub",
+        "fp.mul"             : "mpfr_mul",
+        "fp.div"             : "mpfr_div",
+        "fp.rem"             : "mpfr_remainder",
+        "fp.min"             : "mpfr_min",
+        "fp.max"             : "mpfr_max",
+        "fp.fma"             : "mpfr_fma",
+    }[fp_ops]
+    mpfr_rounding  = True
+    mpfr_rm        = (rm if op_rnd else RM_RNE)
+    mpfr_supported = True
+    if fp_ops in ("fp.nextUp", "fp.nextDown"):
+        mpfr_rounding = False
+        mpfr_rm       = None
+        mpfr_supported = False
+    elif rm == RM_RNA:
+        if fp_ops == "fp.roundToIntegral":
+            # We're using a special function here
             mpfr_rounding = False
             mpfr_rm       = None
-            mpfr_supported = False
-        elif rm == RM_RNA:
-            if fp_ops == "fp.roundToIntegral":
-                # We're using a special function here
-                mpfr_rounding = False
-                mpfr_rm       = None
-            elif fp_ops == "fp.sqrt":
-                # RNE and RNA do the same, see Theorem 19 in HoFPA
-                mpfr_rm = RM_RNE
-            else:
-                # Otherwise, this operation is not supported by GNU/MPFR
-                mpfr_supported = False
-
-        if precision_eb == 8 and precision_sb == 24:
-            c_type      = "float"
-            c_supported = True
-            c_indicator = "f"
-        elif precision_eb == 11 and precision_sb == 53:
-            c_type      = "double"
-            c_supported = True
-            c_indicator = ""
+        elif fp_ops == "fp.sqrt":
+            # RNE and RNA do the same, see Theorem 19 in HoFPA
+            mpfr_rm = RM_RNE
         else:
-            c_type      = None
-            c_supported = False
-            c_indicator = ""
+            # Otherwise, this operation is not supported by GNU/MPFR
+            mpfr_supported = False
+
+    # HACK: Right now the generated program assumes 32-bit floats,
+    # both for input parsing and the MPFR precision. Until that's
+    # rewritten and fixed this at least stops us from crashing.
+    if not (precision_eb == 8 and precision_sb == 24):
+        mpfr_supported = False
+        c_supported    = False
+        return results["MPF"]
+
+    # Generate code for and build the evaluator program (unless
+    # already done so).
+    if prog_name not in FP_EVALUATION_PROGRAMS:
         def builtin(name, arity=1):
             args = ["%s__f"] * arity
             return "__builtin_%s%s(%s)" % (name, c_indicator, ", ".join(args))
+
         c_fn = {
             "fp.abs"             : builtin("fabs"),
             "fp.neg"             : "(-%s__f)",
@@ -393,21 +419,12 @@ def fp_eval_function(fp_ops, rm, *args):
             "fp.max"             : builtin("fmax", 2),
             "fp.fma"             : builtin("fma", 3),
         }[fp_ops]
-        c_rounding = op_rnd
-        c_rm       = rm
-        if rm == RM_RNA:
-            if fp_ops == "fp.sqrt":
-                # RNE and RNA do the same, see Theorem 19 in HoFPA
-                c_rm = RM_RNE
-            else:
-                # Otherwise, this operation is not supported by C
-                c_supported = False
 
         # assert c_supported -> mpfr_supported
         # assert (not c_supported) or mpfr_supported
 
+        # produce code for checking using MPFR
         if mpfr_supported:
-            # We do not yet have this program compiled...
             c_inputs = tuple(map(chr, map(lambda x: ord('x') + x,
                                           xrange(len(args)))))
 

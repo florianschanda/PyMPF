@@ -46,48 +46,48 @@ from out_smtlib import *
 # Random floats
 ##############################################################################
 
-def random_zero(sign=0):
-    rv = MPF(8, 24)
+def random_zero(eb, sb, sign=0):
+    rv = MPF(eb, sb)
     if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         rv.set_zero(0)
     else:
         rv.set_zero(1)
     return rv
 
-def random_subnormal(sign=0):
-    rv = MPF(8, 24)
+def random_subnormal(eb, sb, sign=0):
+    rv = MPF(eb, sb)
     S = (0 if sign > 0 or (sign == 0 and random.getrandbits(1) == 0) else 1)
     E = 0
     T = random.randrange(1, 2 ** rv.t)
     rv.pack(S, E, T)
     return rv
 
-def random_normal(sign=0):
-    rv = MPF(8, 24)
+def random_normal(eb, sb, sign=0):
+    rv = MPF(eb, sb)
     S = (0 if sign > 0 or (sign == 0 and random.getrandbits(1) == 0) else 1)
     E = random.randrange(1, 2 ** rv.w - 1)
     T = random.randrange(0, 2 ** rv.t)
     rv.pack(S, E, T)
     return rv
 
-def random_infinite(sign=0):
-    rv = MPF(8, 24)
+def random_infinite(eb, sb, sign=0):
+    rv = MPF(eb, sb)
     if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         rv.set_infinite(0)
     else:
         rv.set_infinite(1)
     return rv
 
-def random_nan():
-    rv = MPF(8, 24)
+def random_nan(eb, sb):
+    rv = MPF(eb, sb)
     S = random.getrandbits(1)
     E = 2 ** rv.w - 1
     T = random.randrange(1, 2 ** rv.t)
     rv.pack(S, E, T)
     return rv
 
-def smallest_subnormal(sign=0):
-    rv = MPF(8, 24)
+def smallest_subnormal(eb, sb, sign=0):
+    rv = MPF(eb, sb)
     if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         S = 0
     else:
@@ -97,8 +97,8 @@ def smallest_subnormal(sign=0):
     rv.pack(S, E, T)
     return rv
 
-def largest_subnormal(sign=0):
-    rv = MPF(8, 24)
+def largest_subnormal(eb, sb, sign=0):
+    rv = MPF(eb, sb)
     if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         S = 0
     else:
@@ -108,8 +108,8 @@ def largest_subnormal(sign=0):
     rv.pack(S, E, T)
     return rv
 
-def smallest_normal(sign=0):
-    rv = MPF(8, 24)
+def smallest_normal(eb, sb, sign=0):
+    rv = MPF(eb, sb)
     if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         S = 0
     else:
@@ -119,8 +119,8 @@ def smallest_normal(sign=0):
     rv.pack(S, E, T)
     return rv
 
-def largest_normal(sign=0):
-    rv = MPF(8, 24)
+def largest_normal(eb, sb, sign=0):
+    rv = MPF(eb, sb)
     if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         S = 0
     else:
@@ -130,32 +130,32 @@ def largest_normal(sign=0):
     rv.pack(S, E, T)
     return rv
 
-def random_halfpoint(sign=0):
+def random_halfpoint(eb, sb, sign=0):
     # Returns something.5 which is great to test various tie-breaks things
     # involving integers.
-    rv = MPF(8, 24)
+    rv = MPF(eb, sb)
     i = random.randint(0, 2 ** (rv.p - 1) - 1)
     rv.from_rational(RM_RNE, Rational(i * 2 + 1, 2))
     rv.set_sign_bit(sign < 0 or (sign == 0 and random.getrandbits(1) == 0))
     return rv
 
-def ubv_boundary(bv_width, sign=0):
+def ubv_boundary(eb, sb, bv_width, sign=0):
     bv = BitVector(bv_width)
     if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         q = Rational(bv.max_unsigned)
     else:
         q = Rational(bv.min_unsigned)
-    rv = MPF(8, 24)
+    rv = MPF(eb, sb)
     rv.from_rational(RM_RNE, q)
     return rv
 
-def sbv_boundary(bv_width, sign=0):
+def sbv_boundary(eb, sb, bv_width, sign=0):
     bv = BitVector(bv_width)
     if sign > 0 or (sign == 0 and random.getrandbits(1) == 0):
         q = Rational(bv.max_signed)
     else:
         q = Rational(bv.min_signed)
-    rv = MPF(8, 24)
+    rv = MPF(eb, sb)
     rv.from_rational(RM_RNE, q)
     return rv
 
@@ -215,95 +215,99 @@ def gen_rm(fp_ops):
     else:
         yield RM_RNE
 
+def gen_precisions():
+    yield (8, 24)
+
 def gen_vectors(fp_ops, n, test_dup):
     assert n >= 1
     assert test_dup >= 1
 
     CONSTRUCTORS = {
-        "-0"         : lambda: random_zero(-1),
-        "+0"         : lambda: random_zero(1),
-        "-minsub"    : lambda: smallest_subnormal(-1),
-        "+minsub"    : lambda: smallest_subnormal(1),
-        "-subnormal" : lambda: random_subnormal(-1),
-        "+subnormal" : lambda: random_subnormal(1),
-        "-maxsub"    : lambda: largest_subnormal(-1),
-        "+maxsub"    : lambda: largest_subnormal(1),
-        "-minnormal" : lambda: smallest_normal(-1),
-        "+minnormal" : lambda: smallest_normal(1),
-        "-normal"    : lambda: random_normal(-1),
-        "+normal"    : lambda: random_normal(1),
-        "-halfpoint" : lambda: random_halfpoint(-1),
-        "+halfpoint" : lambda: random_halfpoint(1),
-        "-maxnormal" : lambda: largest_normal(-1),
-        "+maxnormal" : lambda: largest_normal(1),
-        "-inf"       : lambda: random_infinite(-1),
-        "+inf"       : lambda: random_infinite(1),
-        "nan"        : lambda: random_nan(),
+        "-0"         : lambda eb, sb: random_zero(eb, sb, -1),
+        "+0"         : lambda eb, sb: random_zero(eb, sb, 1),
+        "-minsub"    : lambda eb, sb: smallest_subnormal(eb, sb, -1),
+        "+minsub"    : lambda eb, sb: smallest_subnormal(eb, sb, 1),
+        "-subnormal" : lambda eb, sb: random_subnormal(eb, sb, -1),
+        "+subnormal" : lambda eb, sb: random_subnormal(eb, sb, 1),
+        "-maxsub"    : lambda eb, sb: largest_subnormal(eb, sb, -1),
+        "+maxsub"    : lambda eb, sb: largest_subnormal(eb, sb, 1),
+        "-minnormal" : lambda eb, sb: smallest_normal(eb, sb, -1),
+        "+minnormal" : lambda eb, sb: smallest_normal(eb, sb, 1),
+        "-normal"    : lambda eb, sb: random_normal(eb, sb, -1),
+        "+normal"    : lambda eb, sb: random_normal(eb, sb, 1),
+        "-halfpoint" : lambda eb, sb: random_halfpoint(eb, sb, -1),
+        "+halfpoint" : lambda eb, sb: random_halfpoint(eb, sb, 1),
+        "-maxnormal" : lambda eb, sb: largest_normal(eb, sb, -1),
+        "+maxnormal" : lambda eb, sb: largest_normal(eb, sb, 1),
+        "-inf"       : lambda eb, sb: random_infinite(eb, sb, -1),
+        "+inf"       : lambda eb, sb: random_infinite(eb, sb, 1),
+        "nan"        : lambda eb, sb: random_nan(eb, sb),
     }
     if fp_ops in ("fp.to.ubv", "fp.to.sbv"):
         for k in ("-minsub", "+minsub",
                   "-maxsub", "+maxsub"):
             del CONSTRUCTORS[k]
-        CONSTRUCTORS["-sbv_8_bound"] = lambda: sbv_boundary(8, -1)
-        CONSTRUCTORS["+sbv_8_bound"] = lambda: sbv_boundary(8, 1)
-        CONSTRUCTORS["+ubv_8_bound"] = lambda: ubv_boundary(8, 1)
+        CONSTRUCTORS["-sbv_8_bound"] = lambda eb, sb: sbv_boundary(eb, sb, 8, -1)
+        CONSTRUCTORS["+sbv_8_bound"] = lambda eb, sb: sbv_boundary(eb, sb, 8, 1)
+        CONSTRUCTORS["+ubv_8_bound"] = lambda eb, sb: ubv_boundary(eb, sb, 8, 1)
 
     TARGETS   = tuple(sorted(list(CONSTRUCTORS)))
     N_TARGETS = len(TARGETS)
 
     history = set()
 
-    def mk_float(c):
+    def mk_float(eb, sb, c):
         assert 0 <= c < N_TARGETS
-        return CONSTRUCTORS[TARGETS[c]]()
+        return CONSTRUCTORS[TARGETS[c]](eb, sb)
 
-    for rm in gen_rm(fp_ops):
-        classes = [0] * n
-        while True:
-            text = map(lambda x: TARGETS[x], classes)
-            for test_index in xrange(test_dup):
-                # Seed each test the same way, so that when we
-                # re-build tests with new constructors, the existing
-                # ones don't change.
-                #
-                # TODO: Add a command-line flag to change the core
-                # seed.
-                seed_str = "__".join(text + [str(test_index)])
-                random.seed(seed_str)
+    for eb, sb in gen_precisions():
+        for rm in gen_rm(fp_ops):
+            classes = [0] * n
+            while True:
+                text = map(lambda x: TARGETS[x], classes)
+                for test_index in xrange(test_dup):
+                    # Seed each test the same way, so that when we
+                    # re-build tests with new constructors, the existing
+                    # ones don't change.
+                    #
+                    # TODO: Add a command-line flag to change the core
+                    # seed.
+                    seed_str = "__".join(text + [str(test_index)])
+                    random.seed(seed_str)
 
-                # Create test.
-                v_exp = random.choice(["sat", "unsat"])
-                v_val = map(mk_float, classes)
-                h     = tuple([v_exp] + [rm] + map(lambda x: x.bv, v_val))
-                comment = "(" + fp_ops
-                if is_rounding(fp_ops):
-                    comment += " " + rm
-                comment += " "
-                comment += " ".join(text)
-                comment += ")"
-                if h not in history:
-                    history.add(h)
-                    yield {
-                        "ops"         : fp_ops,
-                        "rounding"    : rm,
-                        "expectation" : v_exp,
-                        "values"      : v_val,
-                        "comment"     : comment,
-                        "raw_kinds"   : text,
-                    }
+                    # Create test.
+                    v_exp = random.choice(["sat", "unsat"])
+                    v_val = map(lambda c: mk_float(eb, sb, c), classes)
+                    h     = tuple([v_exp] + [rm] + map(lambda x: x.bv, v_val))
+                    comment = "(" + fp_ops
+                    if is_rounding(fp_ops):
+                        comment += " " + rm
+                    comment += " "
+                    comment += " ".join(text)
+                    comment += ")"
+                    if h not in history:
+                        history.add(h)
+                        yield {
+                            "ops"         : fp_ops,
+                            "rounding"    : rm,
+                            "expectation" : v_exp,
+                            "values"      : v_val,
+                            "comment"     : comment,
+                            "raw_kinds"   : text,
+                        }
 
-            # Select the next class of test to produce.
-            k = n - 1
-            while (k >= 0):
-                if classes[k] < (N_TARGETS - 1):
-                    classes[k] += 1
+                # Select the next class of test to produce.
+                k = n - 1
+                while (k >= 0):
+                    if classes[k] < (N_TARGETS - 1):
+                        classes[k] += 1
+                        break
+                    else:
+                        assert classes[k] == (N_TARGETS - 1)
+                        classes[k] = 0
+                        k -= 1
+                if k == -1:
                     break
-                else:
-                    assert classes[k] == (N_TARGETS - 1)
-                    classes[k] = 0
-                    k -= 1
-            if k == -1:
-                break
 
 def gen_bv_vectors(fp_ops, n, test_dup):
     assert n == 1
@@ -445,7 +449,7 @@ def gen_int_vectors(fp_ops, n, test_dup):
 # Test generation
 ##############################################################################
 
-test_id = 0
+test_id = {}
 
 def new_test(testvec):
     global test_id
@@ -453,16 +457,17 @@ def new_test(testvec):
     if not os.path.exists(testvec["ops"]):
         os.mkdir(testvec["ops"])
 
-    test_id += 1
+    test_id[testvec["ops"]] = test_id.get(testvec["ops"], 0) + 1
 
     test_name = testvec["ops"]
     if test_name.startswith("fp."):
         test_name = test_name[3:]
     if is_rounding(testvec["ops"]):
         test_name += "_" + testvec["rounding"].lower()
-    test_name += "_%05u.smt2" % test_id
+    test_name += "_%05u.smt2" % test_id[testvec["ops"]]
 
-    print ">>> Generating test %u %s" % (test_id, testvec["comment"])
+    print ">>> Generating test %u %s" % (test_id[testvec["ops"]],
+                                         testvec["comment"])
     return open(os.path.join(testvec["ops"], test_name), "w")
 
 

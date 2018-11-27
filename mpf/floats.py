@@ -329,8 +329,12 @@ class MPF(object):
         elif 1 <= E or T != 0:
             rv += "0x%0*X" % (self.k / 4, self.bv)
             rv += " "
-            rv += "[%s, %f]" % (self.to_rational(),
-                                self.to_rational().to_python_float())
+            q = self.to_rational()
+            f = q.to_python_float()
+            if f is not None:
+                rv += "[%s, %f]" % (q, f)
+            else:
+                rv += "[%s]" % q
         else:
             if S:
                 rv += "-"

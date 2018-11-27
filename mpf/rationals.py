@@ -83,7 +83,10 @@ class Rational(object):
         return self.a
 
     def to_python_float(self):
-        return float(self.a) / float(self.b)
+        try:
+            return float(self.a) / float(self.b)
+        except OverflowError:
+            return None
 
     def to_smtlib(self):
         tmp = "%u.0" % abs(self.a)
