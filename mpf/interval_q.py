@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 ##############################################################################
 ##                                                                          ##
 ##                                PYMPF                                     ##
 ##                                                                          ##
 ##              Copyright (C) 2016-2017, Altran UK Limited                  ##
+##              Copyright (C) 2019,      Zenuity AB                         ##
 ##                                                                          ##
 ##  This file is part of PyMPF.                                             ##
 ##                                                                          ##
@@ -30,7 +31,7 @@
 # Representation uses the "German" method, i.e. "]2 3]" is the
 # interval between 2 and 3, excluding 2 but including 3.
 
-from rationals import *
+from .rationals import *
 
 KIND_INFINITE  = "infinite"
 KIND_INCLUSIVE = "inclusive"

@@ -1,10 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 ##############################################################################
 ##                                                                          ##
 ##                                PYMPF                                     ##
 ##                                                                          ##
 ##              Copyright (C) 2016-2017, Altran UK Limited                  ##
 ##              Copyright (C) 2018,      Florian Schanda                    ##
+##              Copyright (C) 2019,      Zenuity AB                         ##
 ##                                                                          ##
 ##  This file is part of PyMPF.                                             ##
 ##                                                                          ##
@@ -41,10 +42,10 @@
 
 import random
 
-from rationals import *
-from interval_q import Interval
-from bitvector import BitVector
-from bisect import Bisect
+from .rationals import *
+from .interval_q import Interval
+from .bitvector import BitVector
+from .bisect import Bisect
 
 ##############################################################################
 # IEEE Floats
@@ -187,7 +188,7 @@ class MPF(object):
             self.bv   = guess.value()
             v         = self.to_rational()
             low, high = guess.bounds()
-            # print "%08X" % self.bv, v, v.to_python_float(), low, high
+            # print("%08X" % (self.bv, v, v.to_python_float(), low, high))
 
             if v > target:
                 guess.too_high()
@@ -199,8 +200,8 @@ class MPF(object):
                 self.set_sign_bit(sign)
                 return
         assert low + 1 == high or low == high
-        # print "low : %08X" % low
-        # print "high: %08X" % high
+        # print("low : %08X" % low)
+        # print("high: %08X" % high)
 
         # Binary search has given us a lower and upper bound, now we
         # select based on rounding mode.
@@ -327,7 +328,7 @@ class MPF(object):
             else:
                 rv += "NaN"
         elif 1 <= E or T != 0:
-            rv += "0x%0*X" % (self.k / 4, self.bv)
+            rv += "0x%0*X" % (self.k // 4, self.bv)
             rv += " "
             rv += "[%s, %f]" % (self.to_rational(),
                                 self.to_rational().to_python_float())
@@ -478,7 +479,7 @@ class MPF(object):
         lit = "((_ to_fp %u %u) " % (self.w, self.p)
         if self.k % 4 == 0:
             # we can use a hex bitvector
-            lit += "#x%0*X" % (self.k / 4, self.bv)
+            lit += "#x%0*X" % (self.k // 4, self.bv)
         else:
             # we need to use a binary bitvector
             lit += ("#b{0:0%ub}" % self.k).format(self.bv)
@@ -518,6 +519,15 @@ class MPF(object):
 
     def smtlib_random_literal(self):
         return random.choice(self.smtlib_literals())
+
+def q_round(rm, n):
+    assert rm in MPF.ROUNDING_MODES
+    rnd = {RM_RNE : q_round_rne,
+           RM_RNA : q_round_rna,
+           RM_RTZ : q_round_rtz,
+           RM_RTP : q_round_rtp,
+           RM_RTN : q_round_rtn}[rm]
+    return rnd(n)
 
 def fp_add(rm, left, right):
     assert rm in MPF.ROUNDING_MODES
@@ -907,20 +917,20 @@ def interval_nearest(rm, op):
     DEBUG_INTERVAL = False
 
     if DEBUG_INTERVAL:
-        print "Interval query: %s [%s]" % (op, rm)
+        print("Interval query: %s [%s]" % (op, rm))
 
     interval = Interval()
 
     op_is_even = (op.bv % 2) == 0
     if DEBUG_INTERVAL:
         if rm == RM_RNE:
-            print "> even? : %s" % op_is_even
+            print("> even? : %s" % op_is_even)
 
     low  = fp_nextDown(op)
     high = fp_nextUp(op)
     if DEBUG_INTERVAL:
-        print "> low  : %s" % low
-        print "> high : %s" % high
+        print("> low  : %s" % low)
+        print("> high : %s" % high)
 
     # Boundary for infinity, as described in IEEE 754 (Section 4.3.1)
     #
@@ -931,7 +941,7 @@ def interval_nearest(rm, op):
     # I have chosen to interpret this as >=, instead of >.
     inf = Rational(op.inf_boundary())
     if DEBUG_INTERVAL:
-        print "> inf  : %s" % inf
+        print("> inf  : %s" % inf)
 
     # Lets establish some basic bounds relevant to round-to-nearest
     #
@@ -983,10 +993,10 @@ def interval_nearest(rm, op):
         high_inclusive = True
 
     if DEBUG_INTERVAL:
-        print "> established high bound : %s %s" % (q_high,
+        print("> established high bound : %s %s" % (q_high,
                                                     "inclusive"
                                                     if high_inclusive
-                                                    else "")
+                                                    else ""))
 
     # Sanity check that the interval does or does not convert back
     if q_high is not None:
@@ -1018,10 +1028,10 @@ def interval_nearest(rm, op):
         low_inclusive = True
 
     if DEBUG_INTERVAL:
-        print "> established low bound  : %s %s" % (q_low,
+        print("> established low bound  : %s %s" % (q_low,
                                                     "inclusive"
                                                     if low_inclusive
-                                                    else "")
+                                                    else ""))
 
     # Sanity check that the interval does or does not convert back
     if q_low is not None:
@@ -1050,14 +1060,14 @@ def interval_nearest(rm, op):
             tmp += "]"
         else:
             tmp += "["
-        print "> interval : %s" % tmp
+        print("> interval : %s" % tmp)
 
     if q_low is not None:
         interval.set_low(q_low, low_inclusive)
     if q_high is not None:
         interval.set_high(q_high, high_inclusive)
     if DEBUG_INTERVAL:
-        print "> interval : %s" % interval
+        print("> interval : %s" % interval)
 
     return interval
 

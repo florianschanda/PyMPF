@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 ##############################################################################
 ##                                                                          ##
 ##                                PYMPF                                     ##
 ##                                                                          ##
 ##              Copyright (C) 2016-2017, Altran UK Limited                  ##
+##              Copyright (C) 2019,      Zenuity AB                         ##
 ##                                                                          ##
 ##  This file is part of PyMPF.                                             ##
 ##                                                                          ##
@@ -26,23 +27,28 @@
 # wheel.
 
 import fractions
-import floats
 
 class Rational(object):
     def __init__(self, a=0, b=1):
+        assert type(a) is int
+        assert type(b) is int
+
         assert b != 0
         self.a = (a if b > 0 else -a)
         self.b = abs(b)
         d = fractions.gcd(self.a, self.b)
         assert d > 0
-        self.a = self.a / d
-        self.b = self.b / d
+        self.a = self.a // d
+        self.b = self.b // d
+
+        assert type(self.a) is int
+        assert type(self.b) is int
 
     def __mul__(self, other):
         return Rational(self.a*other.a,
                         self.b*other.b)
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         return Rational(self.a*other.b,
                         self.b*other.a)
 
@@ -66,8 +72,23 @@ class Rational(object):
         else:
             return "Rational(%i, %u)" % (self.a, self.b)
 
-    def __cmp__(self, other):
-        return cmp(self.a*other.b, other.a*self.b)
+    def __lt__(self, other):
+        return self.a*other.b < other.a*self.b
+
+    def __le__(self, other):
+        return self.a*other.b <= other.a*self.b
+
+    def __eq__(self, other):
+        return self.a*other.b == other.a*self.b
+
+    def __ne__(self, other):
+        return self.a*other.b != other.a*self.b
+
+    def __gt__(self, other):
+        return self.a*other.b > other.a*self.b
+
+    def __ge__(self, other):
+        return self.a*other.b >= other.a*self.b
 
     def isZero(self):
         return self.a == 0
@@ -153,11 +174,3 @@ def q_round_rtn(n):
     else:
         return Rational(i)
 
-def q_round(rm, n):
-    assert rm in floats.MPF.ROUNDING_MODES
-    rnd = {floats.RM_RNE : q_round_rne,
-           floats.RM_RNA : q_round_rna,
-           floats.RM_RTZ : q_round_rtz,
-           floats.RM_RTP : q_round_rtp,
-           floats.RM_RTN : q_round_rtn}[rm]
-    return rnd(n)

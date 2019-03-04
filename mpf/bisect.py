@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 ##############################################################################
 ##                                                                          ##
 ##                                PYMPF                                     ##
 ##                                                                          ##
 ##              Copyright (C) 2016-2017, Altran UK Limited                  ##
+##              Copyright (C) 2019,      Zenuity AB                         ##
 ##                                                                          ##
 ##  This file is part of PyMPF.                                             ##
 ##                                                                          ##
@@ -40,7 +41,7 @@ class Bisect(object):
         self.search_max = high
         self.low        = low
         self.high       = high
-        self.v          = (self.low + self.high) / 2
+        self.v          = (self.low + self.high) // 2
 
     def too_low(self):
         if self.v == self.high:
@@ -54,7 +55,7 @@ class Bisect(object):
             self.v = None
             return
         self.low = self.v
-        self.v   = (self.low + self.high) / 2
+        self.v   = (self.low + self.high) // 2
 
     def too_high(self):
         if self.low + 1 == self.high and self.low == self.search_min:
@@ -64,7 +65,7 @@ class Bisect(object):
             self.v = None
             return
         self.high = self.v
-        self.v   = (self.low + self.high) / 2
+        self.v   = (self.low + self.high) // 2
 
     def __iter__(self):
         class Guess(object):
@@ -90,7 +91,7 @@ class Bisect(object):
             def __iter__(self):
                 return self
 
-            def next(self):
+            def __next__(self):
                 if self.bo.v is None:
                     raise StopIteration
                 else:
