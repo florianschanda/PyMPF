@@ -60,6 +60,14 @@ class Rational(object):
         return Rational(self.a*other.b - other.a*self.b,
                         self.b*other.b)
 
+    def __pow__(self, other):
+        assert other.isIntegral()
+
+        a = fractions.Fraction(self.a, self.b)
+        p = a ** other.a
+
+        return Rational(p.numerator, p.denominator)
+
     def __abs__(self):
         return Rational(abs(self.a), self.b)
 
