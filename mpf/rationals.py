@@ -122,6 +122,37 @@ class Rational(object):
             tmp = "(- %s)" % tmp
         return tmp
 
+    def to_decimal_string(self):
+        if self.b > 2:
+            b = self.b
+            while b > 1:
+                if b % 2 == 0:
+                    b = b // 2
+                elif b % 5 == 0:
+                    b = b // 5
+                else:
+                    raise Exception("decimal for %u / %u will not terminate" %
+                                    (self.a, self.b))
+
+        rv = str(abs(self.a) // self.b)
+
+        a = abs(self.a) % self.b
+        b = self.b
+
+        if a > 0:
+            rv += "."
+            while a > 0:
+                a *= 10
+                rv += str(a // b)
+                a = a % b
+        else:
+            rv += ".0"
+
+        if self.isNegative():
+            return "-" + rv
+        else:
+            return rv
+
 def q_pow2(n):
     if n >= 0:
         return Rational(2**n)
@@ -182,3 +213,46 @@ def q_round_rtn(n):
     else:
         return Rational(i)
 
+def q_from_decimal_fragments(sign, integer_part, fraction_part, exp_part):
+    """
+    Build a rational from fragments of a decimal number.
+
+    E.g. for "1.23E-1" we have fragments for
+       sign          =   ""
+       integer_part  =  "1"
+       fraction_part = "23"
+       exp_part      = "-1"
+    """
+    assert sign          is None or (type(sign) is str and
+                                     len(sign) <= 1)
+    assert integer_part  is None or type(integer_part)  is str
+    assert fraction_part is None or type(fraction_part) is str
+    assert exp_part      is None or type(exp_part)      is str
+
+    if integer_part is None or len(integer_part) == 0:
+        q = Rational(0)
+    else:
+        q = Rational(int(integer_part, 10))
+
+    if fraction_part is not None and len(fraction_part) > 0:
+        if fraction_part.startswith("."):
+            fraction_part = fraction_part[1:]
+        f = Rational(0)
+        for digit in reversed(fraction_part):
+            f += Rational(int(digit))
+            f *= Rational(1, 10)
+        q += f
+
+    if exp_part is not None and len(exp_part) > 0:
+        if exp_part.startswith("+"):
+            exp_part = exp_part[1:]
+        if exp_part.startswith("-"):
+            exp_part = exp_part[1:]
+            q *= Rational(1, 10**int(exp_part, 10))
+        else:
+            q *= Rational(10**int(exp_part, 10))
+
+    if sign is not None and sign == "-":
+        q = -q
+
+    return q
