@@ -288,6 +288,30 @@ class MPF(object):
         assert q.isIntegral()
         return q.a
 
+    def to_python_float(self):
+        if self.isNaN():
+            return float("NaN")
+        elif self.isInfinite():
+            if self.isPositive():
+                return float("Infinity")
+            else:
+                return float("-Infinity")
+        else:
+            return self.to_rational().to_python_float()
+
+    def to_python_string(self):
+        if self.isNaN():
+            return "NaN"
+        elif self.isInfinite():
+            if self.isPositive():
+                return "Infinity"
+            else:
+                return "-Infinity"
+        elif self.isZero() and self.isNegative():
+            return "-0"
+        else:
+            return self.to_rational().to_decimal_string()
+
     ######################################################################
     # Setters
 
