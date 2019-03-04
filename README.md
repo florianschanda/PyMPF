@@ -1,3 +1,8 @@
+# Experimental Python3 Port
+This Python3 port of PyMPF and the testcase generator is not
+finished. PyMPF itself should work, but the other tools have not yet
+been ported.
+
 # PyMPF
 This project contains two things:
   - An arbitrary precision IEEE-754 (2008) implementation in Python
@@ -49,4 +54,6 @@ multiple tests exporing all interesting points:
 
 # License and Copyright
 Everything in this repository is licensed under the GNU GPL v3.
-All code is written by Florian Schanda and is :copyright: Altran UK Limited.
+
+All code is written by Florian Schanda and is :copyright: Altran UK
+Limited and :copyright: Zenuity AB.
