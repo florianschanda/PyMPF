@@ -1,3 +1,5 @@
+.PHONY: docs
+
 pypi_package:
 	git clean -xdf
 	python3 setup.py sdist bdist_wheel
@@ -7,3 +9,6 @@ pypi_upload_test: pypi_package
 
 pypi_upload: pypi_package
 	python3 -m twine upload dist/*
+
+docs:
+	sphinx-build -c sphinx -b html . docs

@@ -554,6 +554,25 @@ def q_round(rm, n):
     return rnd(n)
 
 def fp_add(rm, left, right):
+    """Floating-point addition
+
+    Performs a correctly rounded :math:`left + right`. The following special
+    cases apply:
+
+    * NaN propagates
+
+    * Adding opposite infinities results in NaN, otherwise infinities propagate
+
+    * If the precise result is exactly 0 then we special case
+      according to Section 6.3 in IEEE-754:
+
+        * we preserve the sign if left and right have the same sign
+
+        * otherwise, we return -0 if the rounding mode is RTN
+
+        * otherwise, we return +0
+
+    """
     assert rm in MPF.ROUNDING_MODES
     assert left.compatible(right)
     rv = left.new_mpf() # rv == left
