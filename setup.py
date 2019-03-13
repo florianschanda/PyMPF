@@ -7,7 +7,7 @@ with open("README.md", "r") as fd:
 
 setuptools.setup(
     name="pympf",
-    version="1.0.0",
+    version="1.0.1",
     author="Florian Schanda",
     author_email="florian@schanda.org.uk",
     description="An arbitrary precision IEEE-754 implementation in Python",
