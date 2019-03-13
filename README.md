@@ -19,6 +19,13 @@ SMT-LIB. It has been used to validate the FP implementations of CVC4,
 Z3, MathSAT, SONOLAR, Alt-Ergo, Colibri, goSAT, and xsat; and has
 found bugs in all of them ;)
 
+# Installation
+This package is available on PyPI. To install simply run:
+
+```
+$ pip3 install PyMPF
+```
+
 # License and Copyright
 Everything in this repository is licensed under the GNU GPL v3.
 
