@@ -24,19 +24,21 @@
 ##                                                                          ##
 ##############################################################################
 
-# This module implements IEEE floats using bitvectors as the in-memory
-# format, but rationals (plus rounding and special case handling) for
-# calculation. This allows us to directly implement the semantics
-# described in IEEE-754 (2008) without having to consider any of the
-# difficult normalisation problems.
-#
-# The main objective is that the implementation should be simple and
-# simple to understand and as close to IEEE-754 and SMTLIB as possible
-# (as opposed to fast) since the main use is the validation of other
-# IEEE float implementations in SMT solvers (which have to be
-# fast). It is also not a replacement for libraries such as MPFR
-# (which is fast, but complicated and does not totally map onto IEEE
-# floats).
+"""
+This module implements IEEE floats using bitvectors as the in-memory
+format, but rationals (plus rounding and special case handling) for
+calculation. This allows us to directly implement the semantics
+described in IEEE-754 (2008) without having to consider any of the
+difficult normalisation problems.
+
+The main objective is that the implementation should be simple and
+simple to understand and as close to IEEE-754 and SMTLIB as possible
+(as opposed to fast) since the main use is the validation of other
+IEEE float implementations in SMT solvers (which have to be
+fast). It is also not a replacement for libraries such as MPFR
+(which is fast, but complicated and does not totally map onto IEEE
+floats).
+"""
 
 # TODO: Implement RNA in intervals
 
@@ -63,7 +65,30 @@ RM_RTP = "RTP"
 RM_RTN = "RTN"
 RM_RTZ = "RTZ"
 
-class MPF(object):
+class MPF:
+    """Arbitrary precision IEEE-754 floating point number
+
+    *eb* is the number of bits for the exponent.
+
+    *sb* is the number of bits for the significand.
+
+    This includes the "hidden bit", so for example to create a
+    single-precision floating point number we use:
+
+    >>> x = MPF(8, 24)
+
+    By default the created float is +0, however *bitvec* can be used
+    to set the initial value. The expected format is an integer
+    :math:`0 \le bitvec < 2^{eb+sb}` corresponding to the binary
+    interchange format. For example to create the single precision
+    float representing +1:
+
+    >>> x = MPF(8, 24, 0x3f800000)
+    >>> x.to_python_string()
+    '1.0'
+
+    """
+
     ROUNDING_MODES          = (RM_RNE, RM_RNA, RM_RTP, RM_RTN, RM_RTZ)
     ROUNDING_MODES_NEAREST  = (RM_RNE, RM_RNA)
     ROUNDING_MODES_DIRECTED = (RM_RTP, RM_RTN, RM_RTZ)
@@ -87,20 +112,37 @@ class MPF(object):
 
         self.bv   = bitvec
 
+    def __repr__(self):
+        return "MPF(%u, %u, 0x%x)" % (self.w, self.p, self.bv)
+
     ######################################################################
     # Constructors
 
     def new_mpf(self):
+        """Copy constructor
+
+        Returns a new MPF with the same precision and value.
+        """
         return MPF(self.w, self.p, self.bv)
 
     ######################################################################
     # Internal utilities
 
     def compatible(self, other):
+        """Test if another MPF has the same precision"""
         return (self.w == other.w and
                 self.p == other.p)
 
     def unpack(self):
+        """Unpack into sign, exponent, and significand
+
+        Returns a tuple of integers (S, E, T) where *S* is the sign
+        bit, *E* is the exponent, and *T* is the significand.
+
+        This is the inverse of :func:`pack`.
+
+        """
+
         # TODO: remove ugly hack to convert via strings
         bits = "{0:b}".format(self.bv)
         assert len(bits) <= self.k
@@ -113,6 +155,16 @@ class MPF(object):
         return (S, E, T)
 
     def pack(self, S, E, T):
+        """Pack sign, exponent, and significand
+
+        Sets the value of the floating point number, such that
+
+        The sign corresponds to *S*, the exponent is *E*, and the
+        significand is *T*.
+
+        This is the inverse of :func:`unpack`.
+
+        """
         assert 0 <= S <= 1
         assert 0 <= E <= 2 ** self.w - 1
         assert 0 <= T <= 2 ** self.t - 1
@@ -142,6 +194,12 @@ class MPF(object):
         return inf.to_python_int()
 
     def from_rational(self, rm, q):
+        """Convert from rational to MPF
+
+        Sets the value to the nearest representable floating-point
+        value described by *q*, rounded according to *rm*.
+
+        """
         assert rm in MPF.ROUNDING_MODES
 
         inf = Rational(self.inf_boundary())
@@ -255,6 +313,10 @@ class MPF(object):
         self.set_sign_bit(sign)
 
     def to_rational(self):
+        """Convert from MPF to :class:`.Rational`
+
+        Raises AssertionError for infinities or NaN.
+        """
         S, E, T = self.unpack()
 
         if E == 2 ** self.w - 1:
@@ -280,6 +342,13 @@ class MPF(object):
         return v
 
     def to_int(self, rm):
+        """Convert from MPF to Python int`
+
+        Raises AssertionError for infinities and NaN. Returns the
+        integer closest to the floating point, rounded according to
+        *rm*.
+
+        """
         assert rm in MPF.ROUNDING_MODES
         assert self.isFinite()
 
@@ -289,6 +358,17 @@ class MPF(object):
         return q.a
 
     def to_python_float(self):
+        """Convert from MPF to Python float`
+
+        Convert to python float. Do not rely on this to be precise for
+        now.
+
+        .. todo:: Use sys.float_info to first convert to the correct
+          format and then directly interpret the bit-pattern.
+
+        If you want something precise, then use
+        :func:`to_python_string` instead.
+        """
         if self.isNaN():
             return float("NaN")
         elif self.isInfinite():
@@ -300,6 +380,17 @@ class MPF(object):
             return self.to_rational().to_python_float()
 
     def to_python_string(self):
+        """Convert from MPF to Python string`
+
+        Return a string describing the float. We return a decimal
+        string (e.g. '0.25'), except for the following special cases:
+        '-0', 'Infinity', '-Infinity', and 'NaN'.
+
+        The decimal string might be very long (but precise), so if you
+        want something compact then :func:`to_python_float` might be
+        more appropriate.
+
+        """
         if self.isNaN():
             return "NaN"
         elif self.isInfinite():
@@ -316,19 +407,22 @@ class MPF(object):
     # Setters
 
     def set_zero(self, sign):
+        """Set value to zero with the given sign bit"""
         assert 0 <= sign <= 1
         self.pack(sign, 0, 0)
 
     def set_infinite(self, sign):
+        """Set value to infinite with the given sign bit"""
         assert 0 <= sign <= 1
         self.pack(sign, 2 ** self.w - 1, 0)
 
     def set_nan(self):
+        """Set value to NaN"""
         self.pack(1, 2 ** self.w - 1, 2 ** self.t - 1)
 
     def set_sign_bit(self, sign):
-        assert type(sign) is bool
-
+        """Set sign bit"""
+        assert 0 <= sign <= 1
         S, E, T = self.unpack()
         S = (1 if sign else 0)
         self.pack(S, E, T)
@@ -367,6 +461,7 @@ class MPF(object):
         return rv
 
     def __abs__(self):
+        """Compute absolute value"""
         rv = self.new_mpf()
         S, E, T = rv.unpack()
         if not rv.isNaN():
@@ -375,6 +470,7 @@ class MPF(object):
         return rv
 
     def __neg__(self):
+        """Compute inverse"""
         rv = self.new_mpf()
         S, E, T = rv.unpack()
         if not rv.isNaN():
@@ -383,6 +479,7 @@ class MPF(object):
         return rv
 
     def __le__(self, other):
+        """Test floating-point less than or equal"""
         assert self.compatible(other)
         if self.isNaN() or other.isNaN():
             return False
@@ -390,6 +487,7 @@ class MPF(object):
             return self.partial_order() <= other.partial_order()
 
     def __lt__(self, other):
+        """Test floating-point less than"""
         assert self.compatible(other)
         if self.isNaN() or other.isNaN():
             return False
@@ -397,6 +495,7 @@ class MPF(object):
             return self.partial_order() < other.partial_order()
 
     def __ge__(self, other):
+        """Test floating-point greater than or equal"""
         assert self.compatible(other)
         if self.isNaN() or other.isNaN():
             return False
@@ -404,6 +503,7 @@ class MPF(object):
             return self.partial_order() >= other.partial_order()
 
     def __gt__(self, other):
+        """Test floating-point greater than"""
         assert self.compatible(other)
         if self.isNaN() or other.isNaN():
             return False
@@ -411,6 +511,14 @@ class MPF(object):
             return self.partial_order() > other.partial_order()
 
     def __eq__(self, other):
+        """Test floating-point equality
+
+        Note that this is floating-point equality, so comparisons to
+        NaN always fail and -0 and +0 are considered equal.
+
+        If you want true equality, use :func:`smtlib_eq`
+
+        """
         assert self.compatible(other)
         if self.isNaN() or other.isNaN():
             return False
@@ -421,37 +529,63 @@ class MPF(object):
     # Queries
 
     def isZero(self):
+        """Test if value is zero"""
         S, E, T = self.unpack()
         return E == 0 and T == 0
 
     def isSubnormal(self):
+        """Test if value is subnormal"""
         S, E, T = self.unpack()
         return E == 0 and T != 0
 
     def isNormal(self):
+        """Test if value is normal"""
         S, E, T = self.unpack()
         return 1 <= E <= 2 ** self.w - 2
 
     def isNaN(self):
+        """Test if value is not a number"""
         S, E, T = self.unpack()
         return E == 2 ** self.w - 1 and T != 0
 
     def isInfinite(self):
+        """Test if value is infinite"""
         S, E, T = self.unpack()
         return E == 2 ** self.w - 1 and T == 0
 
     def isPositive(self):
+        """Test if value is positive
+
+        Returns always false for NaN.
+        """
         S, E, T = self.unpack()
         return not self.isNaN() and S == 0
 
     def isNegative(self):
+        """Test if value is negative
+
+        Returns always false for NaN.
+        """
         S, E, T = self.unpack()
         return not self.isNaN() and S == 1
 
     def isFinite(self):
+        """Test if value is finite
+
+        Returns true for zero, subnormals, or normal numbers.
+
+        Returns false for infinities, and not a number.
+        """
         return self.isZero() or self.isSubnormal() or self.isNormal()
 
     def isIntegral(self):
+        """Test if value is integral
+
+        Returns true if the floating-point value is an integer, and
+        false in all other cases (including infinities and not a
+        number).
+        """
+
         if self.isFinite():
             return self.to_rational().isIntegral()
         else:
@@ -461,6 +595,14 @@ class MPF(object):
     # SMTLIB support
 
     def smtlib_sort(self):
+        """SMT-LIB sort
+
+        Returns "Float16", "Float32", "Float64", or "Float128" if
+        possible.
+
+        Returns "(_ FloatingPoint *eb* *sb*)" otherwise.
+
+        """
         if self.w == 5 and self.p == 11:
             return "Float16"
         elif self.w == 8 and self.p == 24:
@@ -473,30 +615,46 @@ class MPF(object):
             return "(_ FloatingPoint %u %u)" % (self.w, self.p)
 
     def smtlib_from_binary_interchange(self):
+        """SMT-LIB function for converting from bitvector"""
         return "(_ to_fp %u %u)" % (self.w, self.p)
 
     def smtlib_from_float(self):
+        """SMT-LIB function for converting from FloatingPoint"""
         return "(_ to_fp %u %u)" % (self.w, self.p)
 
     def smtlib_from_real(self):
+        """SMT-LIB function for converting from Real"""
         return "(_ to_fp %u %u)" % (self.w, self.p)
 
     def smtlib_from_int(self):
+        """SMT-LIB function for converting from Int"""
         return "(_ to_fp %u %u)" % (self.w, self.p)
 
     def smtlib_from_ubv(self):
+        """SMT-LIB function for converting from unsigned bitvector"""
         return "(_ to_fp_unsigned %u %u)" % (self.w, self.p)
 
     def smtlib_from_sbv(self):
+        """SMT-LIB function for converting from signed bitvector"""
         return "(_ to_fp %u %u)" % (self.w, self.p)
 
     def smtlib_to_real(self):
+        """SMT-LIB function for converting to Real"""
         return "fp.to_real"
 
     def smtlib_to_int(self):
+        """SMT-LIB function for converting to Int"""
         return "fp.to_int"
 
     def smtlib_literals(self):
+        """Return list of all possible SMTLIB literals
+
+        Includes:
+
+        * Binary interchange conversion, e.g. ((_ to_fp 8 24) #x00000000)
+        * FP literal, e.g. (fp #b0 #b00 #b000)
+        * Special value, e.g. (_ +zero 2 4)
+        """
         choices = []
 
         # Binary interchange
@@ -539,9 +697,19 @@ class MPF(object):
         return choices
 
     def smtlib_literal(self):
+        """Return an SMT-LIB literal
+
+        Favours special cases, such as (_ +zero 8 24), otherwise
+        returns literals of the form (fp ...).
+
+        """
         return self.smtlib_literals()[-1]
 
     def smtlib_random_literal(self):
+        """Return an SMT-LIB literal (randomly chosen)
+
+        Chooses randomly from :func:`smtlib_literals`.
+        """
         return random.choice(self.smtlib_literals())
 
 def q_round(rm, n):
@@ -560,17 +728,13 @@ def fp_add(rm, left, right):
     cases apply:
 
     * NaN propagates
-
     * Adding opposite infinities results in NaN, otherwise infinities propagate
+    * If the precise result is exactly 0 (i.e. 0 + 0 or a + -a) then we
+      special case according to Section 6.3 in IEEE-754:
 
-    * If the precise result is exactly 0 then we special case
-      according to Section 6.3 in IEEE-754:
-
-        * we preserve the sign if left and right have the same sign
-
-        * otherwise, we return -0 if the rounding mode is RTN
-
-        * otherwise, we return +0
+      * we preserve the sign if left and right have the same sign
+      * otherwise, we return -0 if the rounding mode is RTN
+      * otherwise, we return +0
 
     """
     assert rm in MPF.ROUNDING_MODES
@@ -606,6 +770,14 @@ def fp_add(rm, left, right):
     return rv
 
 def fp_sub(rm, left, right):
+    """Floating-point substraction
+
+    Performs a correctly rounded :math:`left - right`, which is
+    equivalent to :math:`left + -right`.
+
+    See :func:`fp_add` for special cases.
+
+    """
     assert rm in MPF.ROUNDING_MODES
     assert left.compatible(right)
     rv = left.new_mpf() # rv == left
@@ -639,6 +811,19 @@ def fp_sub(rm, left, right):
     return rv
 
 def fp_mul(rm, left, right):
+    """Floating-point multiplication
+
+    Performs a correctly rounded :math:`left * right`. The following
+    special cases apply:
+
+    * NaN propagates
+    * Infinities propagate (for non-zero operands)
+    * Multiplying by zero gives the following results
+
+      * NaN if the other operand is infinite
+      * 0 of the same sign as the 0 operand
+
+    """
     assert rm in MPF.ROUNDING_MODES
     assert left.compatible(right)
     sign = (1 if left.isNegative() ^ right.isNegative() else 0)
@@ -660,6 +845,23 @@ def fp_mul(rm, left, right):
     return rv
 
 def fp_div(rm, left, right):
+    """Floating-point division
+
+    Performs a correctly rounded :math:`left \div right`. The
+    following special cases apply:
+
+    * NaN propagates
+    * When dividing by infinity
+
+      * NaN when dividing two infinities
+      * 0 otherwise
+
+    * When dividing by zero
+
+      * NaN when dividing zero by zero
+      * Infinity otherwise
+
+    """
     assert rm in MPF.ROUNDING_MODES
     assert left.compatible(right)
     sign = (1 if left.isNegative() ^ right.isNegative() else 0)
@@ -685,7 +887,17 @@ def fp_div(rm, left, right):
     return rv
 
 def fp_fma(rm, x, y, z):
-    # computes (x * y) + z
+    """Floating-point fused multiply add
+
+    Performs a correctly rounded :math:`x * y + z`. The special cases
+    of :func:`fp_mul` and :func:`fp_add` apply, and in addition:
+
+    * On a precise 0 result the sign of zero is:
+
+      * Preserved if the sign of x * y is the same as z
+      * -0 for RTN
+      * +0 otherwise
+    """
     assert rm in MPF.ROUNDING_MODES
     assert x.compatible(y)
     assert x.compatible(z)
@@ -725,6 +937,7 @@ def fp_fma(rm, x, y, z):
     return rv
 
 def fp_sqrt(rm, op):
+    """Floating-point square root"""
     assert rm in MPF.ROUNDING_MODES
     # We can get away with approximating the square root to sufficient
     # precision because of Theorem 19 (p168) of the Handbook of
@@ -779,6 +992,7 @@ def fp_sqrt(rm, op):
     return root
 
 def fp_rem(left, right):
+    """Floating-point remainder"""
     assert left.compatible(right)
 
     rv = left.new_mpf()
@@ -798,6 +1012,7 @@ def fp_rem(left, right):
     return rv
 
 def fp_roundToIntegral(rm, op):
+    """Floating-point round to integer"""
     assert rm in MPF.ROUNDING_MODES
 
     rv = op.new_mpf()
@@ -814,6 +1029,7 @@ def fp_roundToIntegral(rm, op):
     return rv
 
 def fp_min(left, right):
+    """Floating-point minimum"""
     assert left.compatible(right)
     if (left.isZero() and right.isZero() and
         left.isPositive() != right.isPositive()):
@@ -827,6 +1043,7 @@ def fp_min(left, right):
         return left.new_mpf()
 
 def fp_max(left, right):
+    """Floating-point maximum"""
     assert left.compatible(right)
     if (left.isZero() and right.isZero() and
         left.isPositive() != right.isPositive()):
@@ -840,10 +1057,12 @@ def fp_max(left, right):
         return left.new_mpf()
 
 def smtlib_eq(left, right):
+    """Bit-wise equality"""
     assert left.compatible(right)
     return (left.isNaN() and right.isNaN()) or (left.bv == right.bv)
 
 def fp_nextUp(op):
+    """Floating-point successor"""
     rv = op.new_mpf()
 
     if op.isNaN():
@@ -878,15 +1097,18 @@ def fp_nextUp(op):
     return rv
 
 def fp_nextDown(op):
+    """Floating-point predecessor"""
     # This is how it is defined in 5.3.1
     return -fp_nextUp(-op)
 
 def fp_from_ubv(eb, sb, rm, op):
+    """Conversion from unsigned bitvector to MPF"""
     rv = MPF(eb, sb)
     rv.from_rational(rm, op.to_unsigned_int())
     return rv
 
 def fp_to_ubv(op, rm, width):
+    """Conversion from MPF to unsigned bitvector"""
     if op.isInfinite() or op.isNaN():
         raise Unspecified
 
@@ -900,11 +1122,13 @@ def fp_to_ubv(op, rm, width):
         raise Unspecified
 
 def fp_from_sbv(eb, sb, rm, op):
+    """Conversion from signed bitvector to MPF"""
     rv = MPF(eb, sb)
     rv.from_rational(rm, op.to_signed_int())
     return rv
 
 def fp_to_sbv(op, rm, width):
+    """Conversion from MPF to signed bitvector"""
     if op.isInfinite() or op.isNaN():
         raise Unspecified
 
@@ -919,12 +1143,14 @@ def fp_to_sbv(op, rm, width):
 
 # ((_ to_fp eb sb) rm op)
 def fp_from_int(eb, sb, rm, op):
+    """Conversion from Python integer to MPF"""
     rv = MPF(eb, sb)
     rv.from_rational(rm, Rational(op))
     return rv
 
 # (fp.to_int rm op)
 def fp_to_int(rm, op):
+    """Conversion from MPF to Python integer"""
     if op.isInfinite() or op.isNaN():
         raise Unspecified
 
@@ -938,6 +1164,7 @@ def fp_to_int(rm, op):
 # is where you land when you read 5.4.2), but in 6.3 it says it
 # doesn't change.
 def fp_from_float(eb, sb, rm, op):
+    """Conversion from MPF to MPF (of a different precision)"""
     rv = MPF(eb, sb)
     if op.isNaN():
         rv.set_nan()

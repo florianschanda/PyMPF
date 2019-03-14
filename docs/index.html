@@ -52,30 +52,724 @@
 <div class="toctree-wrapper compound">
 </div>
 </div>
+<div class="section" id="module-mpf.rationals">
+<span id="rationals"></span><h1>Rationals<a class="headerlink" href="#module-mpf.rationals" title="Permalink to this headline">¶</a></h1>
+<p>This module defines class to deal with Rational numbers.</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">This should be a subclass of fractions.Fraction.</p>
+</div>
+<dl class="class">
+<dt id="mpf.rationals.Rational">
+<em class="property">class </em><code class="descclassname">mpf.rationals.</code><code class="descname">Rational</code><span class="sig-paren">(</span><em>a=0</em>, <em>b=1</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rational number</p>
+<p><em>a</em> is the numerator</p>
+<p><em>b</em> is the denominator</p>
+<dl class="method">
+<dt id="mpf.rationals.Rational.__abs__">
+<code class="descname">__abs__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__abs__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absolute value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.__add__">
+<code class="descname">__add__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__add__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Addition</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.__eq__">
+<code class="descname">__eq__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Equality</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.__ge__">
+<code class="descname">__ge__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__ge__" title="Permalink to this definition">¶</a></dt>
+<dd><p>&gt;=</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.__gt__">
+<code class="descname">__gt__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__gt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>&gt;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.__le__">
+<code class="descname">__le__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__le__" title="Permalink to this definition">¶</a></dt>
+<dd><p>&lt;=</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.__lt__">
+<code class="descname">__lt__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__lt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>&lt;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.__mul__">
+<code class="descname">__mul__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__mul__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiplication</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.__ne__">
+<code class="descname">__ne__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__ne__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inequality</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.__neg__">
+<code class="descname">__neg__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__neg__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Negation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.__pow__">
+<code class="descname">__pow__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__pow__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exponentiation</p>
+<p>The right-hand side must be an integral Rational, otherwise
+AssertionError is raised.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.__sub__">
+<code class="descname">__sub__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__sub__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Substraction</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.__truediv__">
+<code class="descname">__truediv__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__truediv__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Division</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mpf.rationals.Rational.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#mpf.rationals.Rational.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.isIntegral">
+<code class="descname">isIntegral</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.isIntegral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if integral</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.isNegative">
+<code class="descname">isNegative</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.isNegative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if negative</p>
+<p>Returns false for 0.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.isZero">
+<code class="descname">isZero</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.isZero" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if zero</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.to_decimal_string">
+<code class="descname">to_decimal_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.to_decimal_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert to decimal string</p>
+<p>If the fraction does not terminate (e.g. for 1 / 3), an
+exception is thrown.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.to_python_float">
+<code class="descname">to_python_float</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.to_python_float" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert to python float</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.to_python_int">
+<code class="descname">to_python_int</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.to_python_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert to python int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.to_smtlib">
+<code class="descname">to_smtlib</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.to_smtlib" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert to SMT-LIB Real expression</p>
+<p>Returns literal for integrals, e.g. &#8220;1.0&#8221;.</p>
+<p>Returns an s-expression otherwise, e.g. &#8220;(- (/ 1.0 3.0))&#8221;.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.rationals.q_from_decimal_fragments">
+<code class="descclassname">mpf.rationals.</code><code class="descname">q_from_decimal_fragments</code><span class="sig-paren">(</span><em>sign</em>, <em>integer_part</em>, <em>fraction_part</em>, <em>exp_part</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.q_from_decimal_fragments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a rational from string fragments of a decimal number.</p>
+<dl class="docutils">
+<dt>E.g. for &#8220;1.23E-1&#8221; we have fragments for</dt>
+<dd>sign          =   &#8220;&#8221;
+integer_part  =  &#8220;1&#8221;
+fraction_part = &#8220;23&#8221;
+exp_part      = &#8220;-1&#8221;</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.rationals.q_pow2">
+<code class="descclassname">mpf.rationals.</code><code class="descname">q_pow2</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.q_pow2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create rational for 2^n</p>
+<p><em>n</em> can be negative</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.rationals.q_round_rna">
+<code class="descclassname">mpf.rationals.</code><code class="descname">q_round_rna</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.q_round_rna" title="Permalink to this definition">¶</a></dt>
+<dd><p>Round to nearest integer, away from zero</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.rationals.q_round_rne">
+<code class="descclassname">mpf.rationals.</code><code class="descname">q_round_rne</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.q_round_rne" title="Permalink to this definition">¶</a></dt>
+<dd><p>Round to nearest even integer</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.rationals.q_round_rtn">
+<code class="descclassname">mpf.rationals.</code><code class="descname">q_round_rtn</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.q_round_rtn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Round to nearest integer, towards negative</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.rationals.q_round_rtp">
+<code class="descclassname">mpf.rationals.</code><code class="descname">q_round_rtp</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.q_round_rtp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Round to nearest integer, towards positive</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.rationals.q_round_rtz">
+<code class="descclassname">mpf.rationals.</code><code class="descname">q_round_rtz</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.q_round_rtz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Round to nearest integer, towards zero</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.rationals.q_round_to_nearest">
+<code class="descclassname">mpf.rationals.</code><code class="descname">q_round_to_nearest</code><span class="sig-paren">(</span><em>n</em>, <em>tiebreak</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.q_round_to_nearest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Round to nearest integer</p>
+<p>Round <em>n</em> to the nearest integer</p>
+<p>Calls the <em>tiebreak*(upper, lower) function with the two
+alternatives if *n</em> is precisely between two integers.</p>
+</dd></dl>
+
+</div>
 <div class="section" id="module-mpf.floats">
 <span id="mpf"></span><h1>MPF<a class="headerlink" href="#module-mpf.floats" title="Permalink to this headline">¶</a></h1>
+<p>This module implements IEEE floats using bitvectors as the in-memory
+format, but rationals (plus rounding and special case handling) for
+calculation. This allows us to directly implement the semantics
+described in IEEE-754 (2008) without having to consider any of the
+difficult normalisation problems.</p>
+<p>The main objective is that the implementation should be simple and
+simple to understand and as close to IEEE-754 and SMTLIB as possible
+(as opposed to fast) since the main use is the validation of other
+IEEE float implementations in SMT solvers (which have to be
+fast). It is also not a replacement for libraries such as MPFR
+(which is fast, but complicated and does not totally map onto IEEE
+floats).</p>
+<dl class="class">
+<dt id="mpf.floats.MPF">
+<em class="property">class </em><code class="descclassname">mpf.floats.</code><code class="descname">MPF</code><span class="sig-paren">(</span><em>eb</em>, <em>sb</em>, <em>bitvec=0</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Arbitrary precision IEEE-754 floating point number</p>
+<p><em>eb</em> is the number of bits for the exponent.</p>
+<p><em>sb</em> is the number of bits for the significand.</p>
+<p>This includes the &#8220;hidden bit&#8221;, so for example to create a
+single-precision floating point number we use:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>By default the created float is +0, however <em>bitvec</em> can be used
+to set the initial value. The expected format is an integer
+<span class="math">\(0 \le bitvec &lt; 2^{eb+sb}\)</span> corresponding to the binary
+interchange format. For example to create the single precision
+float representing +1:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mh">0x3f800000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">to_python_string</span><span class="p">()</span>
+<span class="go">&#39;1.0&#39;</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="mpf.floats.MPF.__abs__">
+<code class="descname">__abs__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.__abs__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute absolute value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.__eq__">
+<code class="descname">__eq__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test floating-point equality</p>
+<p>Note that this is floating-point equality, so comparisons to
+NaN always fail and -0 and +0 are considered equal.</p>
+<p>If you want true equality, use <a class="reference internal" href="#mpf.floats.smtlib_eq" title="mpf.floats.smtlib_eq"><code class="xref py py-func docutils literal"><span class="pre">smtlib_eq()</span></code></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.__ge__">
+<code class="descname">__ge__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.__ge__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test floating-point greater than or equal</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.__gt__">
+<code class="descname">__gt__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.__gt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test floating-point greater than</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.__le__">
+<code class="descname">__le__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.__le__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test floating-point less than or equal</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.__lt__">
+<code class="descname">__lt__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.__lt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test floating-point less than</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.__neg__">
+<code class="descname">__neg__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.__neg__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute inverse</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mpf.floats.MPF.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#mpf.floats.MPF.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.compatible">
+<code class="descname">compatible</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.compatible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if another MPF has the same precision</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.from_rational">
+<code class="descname">from_rational</code><span class="sig-paren">(</span><em>rm</em>, <em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.from_rational" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert from rational to MPF</p>
+<p>Sets the value to the nearest representable floating-point
+value described by <em>q</em>, rounded according to <em>rm</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.isFinite">
+<code class="descname">isFinite</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.isFinite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if value is finite</p>
+<p>Returns true for zero, subnormals, or normal numbers.</p>
+<p>Returns false for infinities, and not a number.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.isInfinite">
+<code class="descname">isInfinite</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.isInfinite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if value is infinite</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.isIntegral">
+<code class="descname">isIntegral</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.isIntegral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if value is integral</p>
+<p>Returns true if the floating-point value is an integer, and
+false in all other cases (including infinities and not a
+number).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.isNaN">
+<code class="descname">isNaN</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.isNaN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if value is not a number</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.isNegative">
+<code class="descname">isNegative</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.isNegative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if value is negative</p>
+<p>Returns always false for NaN.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.isNormal">
+<code class="descname">isNormal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.isNormal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if value is normal</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.isPositive">
+<code class="descname">isPositive</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.isPositive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if value is positive</p>
+<p>Returns always false for NaN.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.isSubnormal">
+<code class="descname">isSubnormal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.isSubnormal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if value is subnormal</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.isZero">
+<code class="descname">isZero</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.isZero" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if value is zero</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.new_mpf">
+<code class="descname">new_mpf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.new_mpf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy constructor</p>
+<p>Returns a new MPF with the same precision and value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.pack">
+<code class="descname">pack</code><span class="sig-paren">(</span><em>S</em>, <em>E</em>, <em>T</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.pack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pack sign, exponent, and significand</p>
+<p>Sets the value of the floating point number, such that</p>
+<p>The sign corresponds to <em>S</em>, the exponent is <em>E</em>, and the
+significand is <em>T</em>.</p>
+<p>This is the inverse of <a class="reference internal" href="#mpf.floats.MPF.unpack" title="mpf.floats.MPF.unpack"><code class="xref py py-func docutils literal"><span class="pre">unpack()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.set_infinite">
+<code class="descname">set_infinite</code><span class="sig-paren">(</span><em>sign</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.set_infinite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set value to infinite with the given sign bit</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.set_nan">
+<code class="descname">set_nan</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.set_nan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set value to NaN</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.set_sign_bit">
+<code class="descname">set_sign_bit</code><span class="sig-paren">(</span><em>sign</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.set_sign_bit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set sign bit</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.set_zero">
+<code class="descname">set_zero</code><span class="sig-paren">(</span><em>sign</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.set_zero" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set value to zero with the given sign bit</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.smtlib_from_binary_interchange">
+<code class="descname">smtlib_from_binary_interchange</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.smtlib_from_binary_interchange" title="Permalink to this definition">¶</a></dt>
+<dd><p>SMT-LIB function for converting from bitvector</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.smtlib_from_float">
+<code class="descname">smtlib_from_float</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.smtlib_from_float" title="Permalink to this definition">¶</a></dt>
+<dd><p>SMT-LIB function for converting from FloatingPoint</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.smtlib_from_int">
+<code class="descname">smtlib_from_int</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.smtlib_from_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>SMT-LIB function for converting from Int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.smtlib_from_real">
+<code class="descname">smtlib_from_real</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.smtlib_from_real" title="Permalink to this definition">¶</a></dt>
+<dd><p>SMT-LIB function for converting from Real</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.smtlib_from_sbv">
+<code class="descname">smtlib_from_sbv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.smtlib_from_sbv" title="Permalink to this definition">¶</a></dt>
+<dd><p>SMT-LIB function for converting from signed bitvector</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.smtlib_from_ubv">
+<code class="descname">smtlib_from_ubv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.smtlib_from_ubv" title="Permalink to this definition">¶</a></dt>
+<dd><p>SMT-LIB function for converting from unsigned bitvector</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.smtlib_literal">
+<code class="descname">smtlib_literal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.smtlib_literal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an SMT-LIB literal</p>
+<p>Favours special cases, such as (_ +zero 8 24), otherwise
+returns literals of the form (fp ...).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.smtlib_literals">
+<code class="descname">smtlib_literals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.smtlib_literals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of all possible SMTLIB literals</p>
+<p>Includes:</p>
+<ul class="simple">
+<li>Binary interchange conversion, e.g. ((_ to_fp 8 24) #x00000000)</li>
+<li>FP literal, e.g. (fp #b0 #b00 #b000)</li>
+<li>Special value, e.g. (_ +zero 2 4)</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.smtlib_random_literal">
+<code class="descname">smtlib_random_literal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.smtlib_random_literal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an SMT-LIB literal (randomly chosen)</p>
+<p>Chooses randomly from <a class="reference internal" href="#mpf.floats.MPF.smtlib_literals" title="mpf.floats.MPF.smtlib_literals"><code class="xref py py-func docutils literal"><span class="pre">smtlib_literals()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.smtlib_sort">
+<code class="descname">smtlib_sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.smtlib_sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>SMT-LIB sort</p>
+<p>Returns &#8220;Float16&#8221;, &#8220;Float32&#8221;, &#8220;Float64&#8221;, or &#8220;Float128&#8221; if
+possible.</p>
+<p>Returns &#8220;(_ FloatingPoint <em>eb</em> <em>sb</em>)&#8221; otherwise.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.smtlib_to_int">
+<code class="descname">smtlib_to_int</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.smtlib_to_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>SMT-LIB function for converting to Int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.smtlib_to_real">
+<code class="descname">smtlib_to_real</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.smtlib_to_real" title="Permalink to this definition">¶</a></dt>
+<dd><p>SMT-LIB function for converting to Real</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.to_int">
+<code class="descname">to_int</code><span class="sig-paren">(</span><em>rm</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.to_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert from MPF to Python int`</p>
+<p>Raises AssertionError for infinities and NaN. Returns the
+integer closest to the floating point, rounded according to
+<em>rm</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.to_python_float">
+<code class="descname">to_python_float</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.to_python_float" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert from MPF to Python float`</p>
+<p>Convert to python float. Do not rely on this to be precise for
+now.</p>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">Use sys.float_info to first convert to the correct
+format and then directly interpret the bit-pattern.</p>
+</div>
+<p>If you want something precise, then use
+<a class="reference internal" href="#mpf.floats.MPF.to_python_string" title="mpf.floats.MPF.to_python_string"><code class="xref py py-func docutils literal"><span class="pre">to_python_string()</span></code></a> instead.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.to_python_string">
+<code class="descname">to_python_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.to_python_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert from MPF to Python string`</p>
+<p>Return a string describing the float. We return a decimal
+string (e.g. &#8216;0.25&#8217;), except for the following special cases:
+&#8216;-0&#8217;, &#8216;Infinity&#8217;, &#8216;-Infinity&#8217;, and &#8216;NaN&#8217;.</p>
+<p>The decimal string might be very long (but precise), so if you
+want something compact then <a class="reference internal" href="#mpf.floats.MPF.to_python_float" title="mpf.floats.MPF.to_python_float"><code class="xref py py-func docutils literal"><span class="pre">to_python_float()</span></code></a> might be
+more appropriate.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.to_rational">
+<code class="descname">to_rational</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.to_rational" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert from MPF to <a class="reference internal" href="#mpf.rationals.Rational" title="mpf.rationals.Rational"><code class="xref py py-class docutils literal"><span class="pre">Rational</span></code></a></p>
+<p>Raises AssertionError for infinities or NaN.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.unpack">
+<code class="descname">unpack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.unpack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unpack into sign, exponent, and significand</p>
+<p>Returns a tuple of integers (S, E, T) where <em>S</em> is the sign
+bit, <em>E</em> is the exponent, and <em>T</em> is the significand.</p>
+<p>This is the inverse of <a class="reference internal" href="#mpf.floats.MPF.pack" title="mpf.floats.MPF.pack"><code class="xref py py-func docutils literal"><span class="pre">pack()</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="function">
 <dt id="mpf.floats.fp_add">
 <code class="descclassname">mpf.floats.</code><code class="descname">fp_add</code><span class="sig-paren">(</span><em>rm</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Floating-point addition</p>
 <p>Performs a correctly rounded <span class="math">\(left + right\)</span>. The following special
 cases apply:</p>
-<ul>
-<li><p class="first">NaN propagates</p>
-</li>
-<li><p class="first">Adding opposite infinities results in NaN, otherwise infinities propagate</p>
-</li>
-<li><p class="first">If the precise result is exactly 0 then we special case
-according to Section 6.3 in IEEE-754:</p>
-<blockquote>
-<div><ul class="simple">
+<ul class="simple">
+<li>NaN propagates</li>
+<li>Adding opposite infinities results in NaN, otherwise infinities propagate</li>
+<li>If the precise result is exactly 0 (i.e. 0 + 0 or a + -a) then we
+special case according to Section 6.3 in IEEE-754:<ul>
 <li>we preserve the sign if left and right have the same sign</li>
 <li>otherwise, we return -0 if the rounding mode is RTN</li>
 <li>otherwise, we return +0</li>
 </ul>
-</div></blockquote>
 </li>
 </ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_div">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_div</code><span class="sig-paren">(</span><em>rm</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_div" title="Permalink to this definition">¶</a></dt>
+<dd><p>Floating-point division</p>
+<p>Performs a correctly rounded <span class="math">\(left \div right\)</span>. The
+following special cases apply:</p>
+<ul class="simple">
+<li>NaN propagates</li>
+<li>When dividing by infinity<ul>
+<li>NaN when dividing two infinities</li>
+<li>0 otherwise</li>
+</ul>
+</li>
+<li>When dividing by zero<ul>
+<li>NaN when dividing zero by zero</li>
+<li>Infinity otherwise</li>
+</ul>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_fma">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_fma</code><span class="sig-paren">(</span><em>rm</em>, <em>x</em>, <em>y</em>, <em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_fma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Floating-point fused multiply add</p>
+<p>Performs a correctly rounded <span class="math">\(x * y + z\)</span>. The special cases
+of <a class="reference internal" href="#mpf.floats.fp_mul" title="mpf.floats.fp_mul"><code class="xref py py-func docutils literal"><span class="pre">fp_mul()</span></code></a> and <a class="reference internal" href="#mpf.floats.fp_add" title="mpf.floats.fp_add"><code class="xref py py-func docutils literal"><span class="pre">fp_add()</span></code></a> apply, and in addition:</p>
+<ul class="simple">
+<li>On a precise 0 result the sign of zero is:<ul>
+<li>Preserved if the sign of x * y is the same as z</li>
+<li>-0 for RTN</li>
+<li>+0 otherwise</li>
+</ul>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_from_float">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_from_float</code><span class="sig-paren">(</span><em>eb</em>, <em>sb</em>, <em>rm</em>, <em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_from_float" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conversion from MPF to MPF (of a different precision)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_from_int">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_from_int</code><span class="sig-paren">(</span><em>eb</em>, <em>sb</em>, <em>rm</em>, <em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_from_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conversion from Python integer to MPF</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_from_sbv">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_from_sbv</code><span class="sig-paren">(</span><em>eb</em>, <em>sb</em>, <em>rm</em>, <em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_from_sbv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conversion from signed bitvector to MPF</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_from_ubv">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_from_ubv</code><span class="sig-paren">(</span><em>eb</em>, <em>sb</em>, <em>rm</em>, <em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_from_ubv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conversion from unsigned bitvector to MPF</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_max">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_max</code><span class="sig-paren">(</span><em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Floating-point maximum</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_min">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_min</code><span class="sig-paren">(</span><em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_min" title="Permalink to this definition">¶</a></dt>
+<dd><p>Floating-point minimum</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_mul">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_mul</code><span class="sig-paren">(</span><em>rm</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_mul" title="Permalink to this definition">¶</a></dt>
+<dd><p>Floating-point multiplication</p>
+<p>Performs a correctly rounded <span class="math">\(left * right\)</span>. The following
+special cases apply:</p>
+<ul class="simple">
+<li>NaN propagates</li>
+<li>Infinities propagate (for non-zero operands)</li>
+<li>Multiplying by zero gives the following results<ul>
+<li>NaN if the other operand is infinite</li>
+<li>0 of the same sign as the 0 operand</li>
+</ul>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_nextDown">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_nextDown</code><span class="sig-paren">(</span><em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_nextDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Floating-point predecessor</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_nextUp">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_nextUp</code><span class="sig-paren">(</span><em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_nextUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Floating-point successor</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_rem">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_rem</code><span class="sig-paren">(</span><em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_rem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Floating-point remainder</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_roundToIntegral">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_roundToIntegral</code><span class="sig-paren">(</span><em>rm</em>, <em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_roundToIntegral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Floating-point round to integer</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_sqrt">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_sqrt</code><span class="sig-paren">(</span><em>rm</em>, <em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_sqrt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Floating-point square root</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_sub">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_sub</code><span class="sig-paren">(</span><em>rm</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_sub" title="Permalink to this definition">¶</a></dt>
+<dd><p>Floating-point substraction</p>
+<p>Performs a correctly rounded <span class="math">\(left - right\)</span>, which is
+equivalent to <span class="math">\(left + -right\)</span>.</p>
+<p>See <a class="reference internal" href="#mpf.floats.fp_add" title="mpf.floats.fp_add"><code class="xref py py-func docutils literal"><span class="pre">fp_add()</span></code></a> for special cases.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_to_int">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_to_int</code><span class="sig-paren">(</span><em>rm</em>, <em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_to_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conversion from MPF to Python integer</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_to_sbv">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_to_sbv</code><span class="sig-paren">(</span><em>op</em>, <em>rm</em>, <em>width</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_to_sbv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conversion from MPF to signed bitvector</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.fp_to_ubv">
+<code class="descclassname">mpf.floats.</code><code class="descname">fp_to_ubv</code><span class="sig-paren">(</span><em>op</em>, <em>rm</em>, <em>width</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_to_ubv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conversion from MPF to unsigned bitvector</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mpf.floats.smtlib_eq">
+<code class="descclassname">mpf.floats.</code><code class="descname">smtlib_eq</code><span class="sig-paren">(</span><em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.smtlib_eq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bit-wise equality</p>
 </dd></dl>
 
 </div>
@@ -89,6 +783,7 @@ according to Section 6.3 in IEEE-754:</p>
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">PyMPF</a></li>
+<li><a class="reference internal" href="#module-mpf.rationals">Rationals</a></li>
 <li><a class="reference internal" href="#module-mpf.floats">MPF</a></li>
 </ul>
 
