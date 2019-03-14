@@ -28,6 +28,12 @@ Python 3.5 or later.
 There is also a Python2 port, but I don't plan to maintain it
 (although do shout if you need it).
 
+# Documentation
+This is very much work in progress and entirely incomplete (I just
+started adding this).
+
+* [PyMPF API Documentation](https://florianschanda.github.io/PyMPF/)
+
 # Installation
 This package is available on PyPI. To install simply run:
 
