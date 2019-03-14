@@ -8,16 +8,25 @@ fast. MPFR, SymFPU or Z3's MPF library are what you want.
 
 Why "yet another" implementation?
   - This library supports RNA (MPFR does not)
-  - This library supports subnormals and infinities (MPFR does, but only with tricks)
-  - This library uses IEEE or SMTLIB terminology where possible (unlike MPFR)
-  - This library is done completely in Python unlike gmpy, mpmath, etc.
-  - This library is an independent implementation so can be used to check Z3/CVC4
+  - This library supports subnormals and infinities (MPFR does, but only with
+    tricks)
+  - This library uses IEEE or SMTLIB terminology where possible (MPFR tends to
+    stick to more "maths" terminology)
+  - This library is implemented completely in Python unlike gmpy, mpmath, etc.
+  - This library is an independent implementation so can be used to check
+    Z3/SymFPU
   - This library uses a stupid but simple algorithm to do rounding
 
 The main use of this library is random test-case generation for
 SMT-LIB. It has been used to validate the FP implementations of CVC4,
 Z3, MathSAT, SONOLAR, Alt-Ergo, Colibri, goSAT, and xsat; and has
 found bugs in all of them ;)
+
+# Requirements
+Python 3.5 or later.
+
+There is also a Python2 port, but I don't plan to maintain it
+(although do shout if you need it).
 
 # Installation
 This package is available on PyPI. To install simply run:
@@ -29,5 +38,7 @@ $ pip3 install PyMPF
 # License and Copyright
 Everything in this repository is licensed under the GNU GPL v3.
 
-All code is written by Florian Schanda and is :copyright: Altran UK
-Limited and :copyright: Zenuity AB.
+Key copyright holders that contributed to this library are:
+* Florian Schanda
+* Altran UK Limited
+* Zenuity AB
