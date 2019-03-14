@@ -11,4 +11,6 @@ pypi_upload: pypi_package
 	python3 -m twine upload dist/*
 
 docs:
+	rm -rf docs
 	sphinx-build -c sphinx -b html . docs
+	git add docs
