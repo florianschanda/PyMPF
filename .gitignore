@@ -2,3 +2,4 @@
 *.pyc
 eval__*
 tmp.c
+docs/.doctrees
