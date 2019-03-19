@@ -4,6 +4,7 @@
 ##                                PYMPF                                     ##
 ##                                                                          ##
 ##              Copyright (C) 2016-2017, Altran UK Limited                  ##
+##              Copyright (C) 2019,      Florian Schanda                    ##
 ##              Copyright (C) 2019,      Zenuity AB                         ##
 ##                                                                          ##
 ##  This file is part of PyMPF.                                             ##
@@ -31,10 +32,10 @@
 #       # we use guess.value() to get the current guess
 #       # we use guess.too_high() or too_low() to adjust
 
-class Bisect(object):
+class Bisect:
     def __init__(self, low, high):
-        assert type(low) is int or type(low) is long
-        assert type(high) is int or type(high) is long
+        assert isinstance(low, int)
+        assert isinstance(high, int)
         assert low <= high
 
         self.search_min = low
@@ -68,7 +69,7 @@ class Bisect(object):
         self.v   = (self.low + self.high) // 2
 
     def __iter__(self):
-        class Guess(object):
+        class Guess:
             def __init__(self, bo):
                 self.bo = bo
 
@@ -84,7 +85,7 @@ class Bisect(object):
             def too_high(self):
                 self.bo.too_high()
 
-        class It(object):
+        class It:
             def __init__(self, bo):
                 self.bo = bo
 

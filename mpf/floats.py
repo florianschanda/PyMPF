@@ -4,7 +4,7 @@
 ##                                PYMPF                                     ##
 ##                                                                          ##
 ##              Copyright (C) 2016-2017, Altran UK Limited                  ##
-##              Copyright (C) 2018,      Florian Schanda                    ##
+##              Copyright (C) 2018-2019, Florian Schanda                    ##
 ##              Copyright (C) 2019,      Zenuity AB                         ##
 ##                                                                          ##
 ##  This file is part of PyMPF.                                             ##
@@ -66,7 +66,7 @@ RM_RTN = "RTN"
 RM_RTZ = "RTZ"
 
 class MPF:
-    """Arbitrary precision IEEE-754 floating point number
+    r"""Arbitrary precision IEEE-754 floating point number
 
     *eb* is the number of bits for the exponent.
 
@@ -257,7 +257,7 @@ class MPF:
                 # and we're good to go.
                 self.set_sign_bit(sign)
                 return
-        assert low + 1 == high or low == high
+        assert high in (low, low + 1)
         # print("low : %08X" % low)
         # print("high: %08X" % high)
 
@@ -322,9 +322,9 @@ class MPF:
         if E == 2 ** self.w - 1:
             # Infinity (T = 0) or NaN (T != 0)
             assert False
-        elif 1 <= E or T != 0:
+        elif E >= 1 or T != 0:
             v = q_pow2(1 - self.p) * Rational(T)
-            if 1 <= E:
+            if E >= 1:
                 # normal -1^S * S^(E-bias) * (1 + 2^(1-p) * T)
                 assert E <= 2 ** self.w - 2
                 v = q_pow2(E - self.bias) * (Rational(1) + v)
@@ -445,7 +445,7 @@ class MPF:
                 rv += "oo"
             else:
                 rv += "NaN"
-        elif 1 <= E or T != 0:
+        elif E >= 1 or T != 0:
             rv += "0x%0*X" % (self.k // 4, self.bv)
             rv += " "
             rv += "[%s, %f]" % (self.to_rational(),
@@ -530,27 +530,27 @@ class MPF:
 
     def isZero(self):
         """Test if value is zero"""
-        S, E, T = self.unpack()
+        _, E, T = self.unpack()
         return E == 0 and T == 0
 
     def isSubnormal(self):
         """Test if value is subnormal"""
-        S, E, T = self.unpack()
+        _, E, T = self.unpack()
         return E == 0 and T != 0
 
     def isNormal(self):
         """Test if value is normal"""
-        S, E, T = self.unpack()
+        _, E, _ = self.unpack()
         return 1 <= E <= 2 ** self.w - 2
 
     def isNaN(self):
         """Test if value is not a number"""
-        S, E, T = self.unpack()
+        _, E, T = self.unpack()
         return E == 2 ** self.w - 1 and T != 0
 
     def isInfinite(self):
         """Test if value is infinite"""
-        S, E, T = self.unpack()
+        _, E, T = self.unpack()
         return E == 2 ** self.w - 1 and T == 0
 
     def isPositive(self):
@@ -558,7 +558,7 @@ class MPF:
 
         Returns always false for NaN.
         """
-        S, E, T = self.unpack()
+        S, _, _ = self.unpack()
         return not self.isNaN() and S == 0
 
     def isNegative(self):
@@ -566,7 +566,7 @@ class MPF:
 
         Returns always false for NaN.
         """
-        S, E, T = self.unpack()
+        S, _, _ = self.unpack()
         return not self.isNaN() and S == 1
 
     def isFinite(self):
@@ -712,14 +712,14 @@ class MPF:
         """
         return random.choice(self.smtlib_literals())
 
-def q_round(rm, n):
+def q_round(rm, number):
     assert rm in MPF.ROUNDING_MODES
     rnd = {RM_RNE : q_round_rne,
            RM_RNA : q_round_rna,
            RM_RTZ : q_round_rtz,
            RM_RTP : q_round_rtp,
            RM_RTN : q_round_rtn}[rm]
-    return rnd(n)
+    return rnd(number)
 
 def fp_add(rm, left, right):
     """Floating-point addition
@@ -845,7 +845,7 @@ def fp_mul(rm, left, right):
     return rv
 
 def fp_div(rm, left, right):
-    """Floating-point division
+    r"""Floating-point division
 
     Performs a correctly rounded :math:`left \div right`. The
     following special cases apply:
@@ -886,7 +886,7 @@ def fp_div(rm, left, right):
 
     return rv
 
-def fp_fma(rm, x, y, z):
+def fp_fma(rm, x, y, z): #pylint: disable=invalid-name
     """Floating-point fused multiply add
 
     Performs a correctly rounded :math:`x * y + z`. The special cases
@@ -966,11 +966,11 @@ def fp_sqrt(rm, op):
             root.bv         = guess.value()
             low.bv, high.bv = guess.bounds()
             q               = root.to_rational()
-            sq              = q * q
+            q_squared       = q * q
 
-            if sq > target:
+            if q_squared > target:
                 guess.too_high()
-            elif sq < target:
+            elif q_squared < target:
                 guess.too_low()
             else:
                 # We've found an exact match, we should return that.
@@ -1031,8 +1031,8 @@ def fp_roundToIntegral(rm, op):
 def fp_min(left, right):
     """Floating-point minimum"""
     assert left.compatible(right)
-    if (left.isZero() and right.isZero() and
-        left.isPositive() != right.isPositive()):
+    if left.isZero() and right.isZero() and \
+       left.isPositive() != right.isPositive():
         raise Unspecified
 
     if left.isNaN():
@@ -1045,8 +1045,8 @@ def fp_min(left, right):
 def fp_max(left, right):
     """Floating-point maximum"""
     assert left.compatible(right)
-    if (left.isZero() and right.isZero() and
-        left.isPositive() != right.isPositive()):
+    if left.isZero() and right.isZero() and \
+       left.isPositive() != right.isPositive():
         raise Unspecified
 
     if left.isNaN():
@@ -1059,7 +1059,13 @@ def fp_max(left, right):
 def smtlib_eq(left, right):
     """Bit-wise equality"""
     assert left.compatible(right)
-    return (left.isNaN() and right.isNaN()) or (left.bv == right.bv)
+
+    # All NaN are considered equal in SMT-LIB
+    if left.isNaN() and right.isNaN():
+        return True
+
+    # Otherwise we're equal if we have the same bit-pattern
+    return left.bv == right.bv
 
 def fp_nextUp(op):
     """Floating-point successor"""
@@ -1154,8 +1160,8 @@ def fp_to_int(rm, op):
     if op.isInfinite() or op.isNaN():
         raise Unspecified
 
-    n = op.to_rational()
-    q = q_round(rm, n)
+    q = op.to_rational()
+    q = q_round(rm, q)
     return q.to_python_int()
 
 # Convert op to (_ FloatingPoint eb sb) under rounding mode rm.
@@ -1425,7 +1431,7 @@ TYP_INT   = "int"
 TYP_REAL  = "real"
 TYP_BV    = "bitvector"
 
-class Floating_Point_Operation(object):
+class Floating_Point_Operation:
     def __init__(self,
                  name,
                  arity,

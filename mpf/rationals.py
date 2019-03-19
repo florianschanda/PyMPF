@@ -5,6 +5,7 @@
 ##                                                                          ##
 ##              Copyright (C) 2016-2017, Altran UK Limited                  ##
 ##              Copyright (C) 2019,      Zenuity AB                         ##
+##              Copyright (C) 2019,      Florian Schanda                    ##
 ##                                                                          ##
 ##  This file is part of PyMPF.                                             ##
 ##                                                                          ##
@@ -30,8 +31,9 @@ This module defines class to deal with Rational numbers.
 """
 
 import fractions
+import math
 
-class Rational(object):
+class Rational:
     """Rational number
 
     *a* is the numerator
@@ -39,19 +41,19 @@ class Rational(object):
     *b* is the denominator
     """
     def __init__(self, a=0, b=1):
-        assert type(a) is int
-        assert type(b) is int
+        assert isinstance(a, int)
+        assert isinstance(b, int)
 
         assert b != 0
         self.a = (a if b > 0 else -a)
         self.b = abs(b)
-        d = fractions.gcd(self.a, self.b)
-        assert d > 0
-        self.a = self.a // d
-        self.b = self.b // d
+        denominator = math.gcd(self.a, self.b)
+        assert denominator > 0
+        self.a = self.a // denominator
+        self.b = self.b // denominator
 
-        assert type(self.a) is int
-        assert type(self.b) is int
+        assert isinstance(self.a, int)
+        assert isinstance(self.b, int)
 
     def __mul__(self, other):
         """Multiplication"""
@@ -199,15 +201,15 @@ class Rational(object):
         else:
             return rv
 
-def q_pow2(n):
-    """Create rational for 2^n
+def q_pow2(number):
+    """Create rational for 2^number
 
     *n* can be negative
     """
-    if n >= 0:
-        return Rational(2**n)
+    if number >= 0:
+        return Rational(2 ** number)
     else:
-        return Rational(1, 2**(-n))
+        return Rational(1, 2 ** (-number))
 
 def q_round_to_nearest(n, tiebreak):
     """Round to nearest integer
@@ -285,18 +287,18 @@ def q_from_decimal_fragments(sign, integer_part, fraction_part, exp_part):
        fraction_part = "23"
        exp_part      = "-1"
     """
-    assert sign          is None or (type(sign) is str and
+    assert sign          is None or (isinstance(sign, str) and
                                      len(sign) <= 1)
-    assert integer_part  is None or type(integer_part)  is str
-    assert fraction_part is None or type(fraction_part) is str
-    assert exp_part      is None or type(exp_part)      is str
+    assert integer_part  is None or isinstance(integer_part, str)
+    assert fraction_part is None or isinstance(fraction_part, str)
+    assert exp_part      is None or isinstance(exp_part, str)
 
-    if integer_part is None or len(integer_part) == 0:
-        q = Rational(0)
-    else:
+    if integer_part:
         q = Rational(int(integer_part, 10))
+    else:
+        q = Rational(0)
 
-    if fraction_part is not None and len(fraction_part) > 0:
+    if fraction_part:
         if fraction_part.startswith("."):
             fraction_part = fraction_part[1:]
         f = Rational(0)
@@ -305,7 +307,7 @@ def q_from_decimal_fragments(sign, integer_part, fraction_part, exp_part):
             f *= Rational(1, 10)
         q += f
 
-    if exp_part is not None and len(exp_part) > 0:
+    if exp_part:
         if exp_part.startswith("+"):
             exp_part = exp_part[1:]
         if exp_part.startswith("-"):

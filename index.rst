@@ -156,6 +156,7 @@ Changelog
 
 1.0.4
 ^^^^^
+* We now run PyLint
 
 1.0.3
 ^^^^^

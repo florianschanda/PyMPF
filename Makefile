@@ -14,3 +14,6 @@ docs:
 	rm -rf docs
 	sphinx-build -c sphinx -b html . docs
 	git add docs
+
+lint:
+	pylint3 mpf

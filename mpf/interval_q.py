@@ -4,6 +4,7 @@
 ##                                PYMPF                                     ##
 ##                                                                          ##
 ##              Copyright (C) 2016-2017, Altran UK Limited                  ##
+##              Copyright (C) 2019,      Florian Schanda                    ##
 ##              Copyright (C) 2019,      Zenuity AB                         ##
 ##                                                                          ##
 ##  This file is part of PyMPF.                                             ##
@@ -31,13 +32,11 @@
 # Representation uses the "German" method, i.e. "]2 3]" is the
 # interval between 2 and 3, excluding 2 but including 3.
 
-from .rationals import *
-
 KIND_INFINITE  = "infinite"
 KIND_INCLUSIVE = "inclusive"
 KIND_EXCLUSIVE = "exclusive"
 
-class Interval_Bound(object):
+class Interval_Bound:
     INTERVAL_KINDS = (KIND_INFINITE, KIND_INCLUSIVE, KIND_EXCLUSIVE)
 
     def __init__(self, kind, q=None):
@@ -47,7 +46,7 @@ class Interval_Bound(object):
         self.kind  = kind
         self.value = q
 
-class Interval(object):
+class Interval:
     def __init__(self):
         self.low  = Interval_Bound(KIND_INFINITE)
         self.high = Interval_Bound(KIND_INFINITE)
@@ -74,7 +73,7 @@ class Interval(object):
         return rv
 
     def set_low(self, q, inclusive):
-        assert type(inclusive) is bool
+        assert isinstance(inclusive, bool)
         if inclusive:
             self.low.kind = KIND_INCLUSIVE
         else:
@@ -82,7 +81,7 @@ class Interval(object):
         self.low.value = q
 
     def set_high(self, q, inclusive):
-        assert type(inclusive) is bool
+        assert isinstance(inclusive, bool)
         if inclusive:
             self.high.kind = KIND_INCLUSIVE
         else:

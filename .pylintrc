@@ -1,0 +1,26 @@
+[MASTER]
+
+[REPORTS]
+reports=no
+score=no
+
+[MESSAGES CONTROL]
+disable=bad-whitespace,
+        no-else-return
+
+[BASIC]
+good-names=i,
+           q,   # rational number
+           v,   # value
+           rv,  # return value
+           rm,  # rounding mode
+           op,  # operand
+           sb,  # significand bits
+           eb,  # exponent bits
+           bv,  # bitvector
+           S, E, T, # unpacked format
+           Run,
+           _
+
+attr-rgx=[a-z]+(_[a-z]+)*
+class-rgx=([A-Z]+|[A-Z][a-z]+)(_([A-Z]+|[A-Z][a-z]+))*

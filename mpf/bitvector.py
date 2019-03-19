@@ -3,8 +3,8 @@
 ##                                                                          ##
 ##                                PYMPF                                     ##
 ##                                                                          ##
-##              Copyright (C) 2017, Altran UK Limited                       ##
-##              Copyright (C) 2018, Florian Schanda                         ##
+##              Copyright (C) 2017,      Altran UK Limited                  ##
+##              Copyright (C) 2018-2019, Florian Schanda                    ##
 ##                                                                          ##
 ##  This file is part of PyMPF.                                             ##
 ##                                                                          ##
@@ -25,7 +25,7 @@
 
 import random
 
-class BitVector(object):
+class BitVector:
     def __init__(self, width):
         self.width = width
         self.bv = [0] * width
@@ -43,7 +43,7 @@ class BitVector(object):
     def from_unsigned_int(self, value):
         assert self.min_unsigned <= value <= self.max_unsigned
 
-        for i in xrange(self.width):
+        for i in range(self.width):
             self.bv[self.width - 1 - i] = 1 if (2 ** i) & value else 0
 
     def from_signed_int(self, value):
@@ -60,9 +60,9 @@ class BitVector(object):
 
     def to_unsigned_int(self):
         as_ubv = 0
-        for b in self.bv:
+        for bit in self.bv:
             as_ubv *= 2
-            as_ubv |= b
+            as_ubv |= bit
         return as_ubv
 
     def to_signed_int(self):
