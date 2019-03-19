@@ -154,6 +154,9 @@ Changelog
 1.0
 ---
 
+1.0.4
+^^^^^
+
 1.0.3
 ^^^^^
 * Add basic documentation (fast tutorial, and basic descriptions of
