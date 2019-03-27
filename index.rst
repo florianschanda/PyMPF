@@ -158,6 +158,9 @@ Changelog
 ^^^^^
 * We now run PyLint
 
+* Support pathological precisions such as MPF(2, 2) where the infinity
+  boundary is in fact not an integer (3.5 in this example).
+
 1.0.3
 ^^^^^
 * Add basic documentation (fast tutorial, and basic descriptions of

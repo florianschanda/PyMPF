@@ -1,34 +1,31 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>PyMPF &#8212; PyMPF 1.0.4 documentation</title>
-    
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
         VERSION:     '1.0.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="PyMPF 1.0.4 documentation" href="#" /> 
+    <link rel="search" title="Search" href="search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -314,8 +311,8 @@ exception is thrown.</p>
 <dt id="mpf.rationals.Rational.to_smtlib">
 <code class="descname">to_smtlib</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.to_smtlib" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert to SMT-LIB Real expression</p>
-<p>Returns literal for integrals, e.g. &#8220;1.0&#8221;.</p>
-<p>Returns an s-expression otherwise, e.g. &#8220;(- (/ 1.0 3.0))&#8221;.</p>
+<p>Returns literal for integrals, e.g. “1.0”.</p>
+<p>Returns an s-expression otherwise, e.g. “(- (/ 1.0 3.0))”.</p>
 </dd></dl>
 
 </dd></dl>
@@ -325,11 +322,11 @@ exception is thrown.</p>
 <code class="descclassname">mpf.rationals.</code><code class="descname">q_from_decimal_fragments</code><span class="sig-paren">(</span><em>sign</em>, <em>integer_part</em>, <em>fraction_part</em>, <em>exp_part</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.q_from_decimal_fragments" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build a rational from string fragments of a decimal number.</p>
 <dl class="docutils">
-<dt>E.g. for &#8220;1.23E-1&#8221; we have fragments for</dt>
-<dd>sign          =   &#8220;&#8221;
-integer_part  =  &#8220;1&#8221;
-fraction_part = &#8220;23&#8221;
-exp_part      = &#8220;-1&#8221;</dd>
+<dt>E.g. for “1.23E-1” we have fragments for</dt>
+<dd>sign          =   “”
+integer_part  =  “1”
+fraction_part = “23”
+exp_part      = “-1”</dd>
 </dl>
 </dd></dl>
 
@@ -400,7 +397,7 @@ floats).</p>
 <dd><p>Arbitrary precision IEEE-754 floating point number</p>
 <p><em>eb</em> is the number of bits for the exponent.</p>
 <p><em>sb</em> is the number of bits for the significand.</p>
-<p>This includes the &#8220;hidden bit&#8221;, so for example to create a
+<p>This includes the “hidden bit”, so for example to create a
 single-precision floating point number we use:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>
 </pre></div>
@@ -415,6 +412,7 @@ float representing +1:</p>
 <span class="go">&#39;1.0&#39;</span>
 </pre></div>
 </div>
+<p>The lowest precision that is supported is MPF(2, 2).</p>
 <dl class="method">
 <dt id="mpf.floats.MPF.__abs__">
 <code class="descname">__abs__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.__abs__" title="Permalink to this definition">¶</a></dt>
@@ -478,6 +476,30 @@ NaN always fail and -0 and +0 are considered equal.</p>
 <dd><p>Convert from rational to MPF</p>
 <p>Sets the value to the nearest representable floating-point
 value described by <em>q</em>, rounded according to <em>rm</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.inf_boundary">
+<code class="descname">inf_boundary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.inf_boundary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the point after which we round to infinity</p>
+<p>Determines the (positive) boundary for rounding modes RNE and
+RNA, at which point we always round to infinity. Numbers
+smaller than this <em>may</em> be rounded to infinity, but numbers
+larger than this will always be rounded to infinity.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span><span class="o">.</span><span class="n">inf_boundary</span><span class="p">()</span>
+<span class="go">Rational(340282356779733661637539395458142568448)</span>
+</pre></div>
+</div>
+<p>This is usually an integer, except for pathological
+precisions.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">MPF</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">inf_boundary</span><span class="p">()</span>
+<span class="go">Rational(7, 2)</span>
+</pre></div>
+</div>
+<p>Note that IEEE 754 is not precisely clear if numbers equal to
+or larger than this, or just larger than this are rounded to
+infinty. We have decided to interpret it as equal to or
+larger.</p>
 </dd></dl>
 
 <dl class="method">
@@ -623,7 +645,7 @@ significand is <em>T</em>.</p>
 <code class="descname">smtlib_literal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.smtlib_literal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an SMT-LIB literal</p>
 <p>Favours special cases, such as (_ +zero 8 24), otherwise
-returns literals of the form (fp ...).</p>
+returns literals of the form (fp …).</p>
 </dd></dl>
 
 <dl class="method">
@@ -649,9 +671,9 @@ returns literals of the form (fp ...).</p>
 <dt id="mpf.floats.MPF.smtlib_sort">
 <code class="descname">smtlib_sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.smtlib_sort" title="Permalink to this definition">¶</a></dt>
 <dd><p>SMT-LIB sort</p>
-<p>Returns &#8220;Float16&#8221;, &#8220;Float32&#8221;, &#8220;Float64&#8221;, or &#8220;Float128&#8221; if
+<p>Returns “Float16”, “Float32”, “Float64”, or “Float128” if
 possible.</p>
-<p>Returns &#8220;(_ FloatingPoint <em>eb</em> <em>sb</em>)&#8221; otherwise.</p>
+<p>Returns “(_ FloatingPoint <em>eb</em> <em>sb</em>)” otherwise.</p>
 </dd></dl>
 
 <dl class="method">
@@ -695,8 +717,8 @@ format and then directly interpret the bit-pattern.</p>
 <code class="descname">to_python_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.to_python_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert from MPF to Python string`</p>
 <p>Return a string describing the float. We return a decimal
-string (e.g. &#8216;0.25&#8217;), except for the following special cases:
-&#8216;-0&#8217;, &#8216;Infinity&#8217;, &#8216;-Infinity&#8217;, and &#8216;NaN&#8217;.</p>
+string (e.g. ‘0.25’), except for the following special cases:
+‘-0’, ‘Infinity’, ‘-Infinity’, and ‘NaN’.</p>
 <p>The decimal string might be very long (but precise), so if you
 want something compact then <a class="reference internal" href="#mpf.floats.MPF.to_python_float" title="mpf.floats.MPF.to_python_float"><code class="xref py py-func docutils literal"><span class="pre">to_python_float()</span></code></a> might be
 more appropriate.</p>
@@ -901,6 +923,8 @@ equivalent to <span class="math">\(left + -right\)</span>.</p>
 <h3>1.0.4<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>We now run PyLint</li>
+<li>Support pathological precisions such as MPF(2, 2) where the infinity
+boundary is in fact not an integer (3.5 in this example).</li>
 </ul>
 </div>
 <div class="section" id="id3">
@@ -947,7 +971,7 @@ MPF and Rational classes).</li>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/index.txt"
+      <li><a href="_sources/index.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -979,7 +1003,7 @@ MPF and Rational classes).</li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2019, Florian Schanda.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.9.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
     </div>
   </body>
 </html>

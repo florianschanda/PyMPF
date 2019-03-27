@@ -87,6 +87,8 @@ class MPF:
     >>> x.to_python_string()
     '1.0'
 
+    The lowest precision that is supported is MPF(2, 2).
+
     """
 
     ROUNDING_MODES          = (RM_RNE, RM_RNA, RM_RTP, RM_RTN, RM_RTZ)
@@ -97,8 +99,8 @@ class MPF:
         # Naming chosen so that the interface is close to SMTLIB (eb,
         # sb) and the internals close to IEEE-754 (k, p, w, t, emax,
         # emin).
-        assert eb >= 1
-        assert sb >= 1
+        assert eb >= 2
+        assert sb >= 2
         assert 0 <= bitvec < 2 ** (eb + sb)
 
         self.k    = eb + sb
@@ -189,11 +191,34 @@ class MPF:
             return rv
 
     def inf_boundary(self):
-        inf = q_pow2(self.emax) * \
-              (Rational(2) - Rational(1, 2) * q_pow2(1 - self.p))
-        return inf.to_python_int()
+        """Compute the point after which we round to infinity
+
+        Determines the (positive) boundary for rounding modes RNE and
+        RNA, at which point we always round to infinity. Numbers
+        smaller than this *may* be rounded to infinity, but numbers
+        larger than this will always be rounded to infinity.
+
+        >>> MPF(8, 24).inf_boundary()
+        Rational(340282356779733661637539395458142568448)
+
+        This is usually an integer, except for pathological
+        precisions.
+
+        >>> MPF(2, 2).inf_boundary()
+        Rational(7, 2)
+
+        Note that IEEE 754 is not precisely clear if numbers equal to
+        or larger than this, or just larger than this are rounded to
+        infinty. We have decided to interpret it as equal to or
+        larger.
+
+        """
+
+        return q_pow2(self.emax) * \
+            (Rational(2) - Rational(1, 2) * q_pow2(1 - self.p))
 
     def from_rational(self, rm, q):
+
         """Convert from rational to MPF
 
         Sets the value to the nearest representable floating-point
@@ -202,7 +227,7 @@ class MPF:
         """
         assert rm in MPF.ROUNDING_MODES
 
-        inf = Rational(self.inf_boundary())
+        inf = self.inf_boundary()
 
         target = abs(q)
         sign   = q.isNegative()
