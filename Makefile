@@ -16,4 +16,4 @@ docs:
 	git add docs
 
 lint:
-	pylint3 mpf
+	python3 -m pylint mpf
