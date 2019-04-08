@@ -22,6 +22,10 @@ SMT-LIB. It has been used to validate the FP implementations of CVC4,
 Z3, MathSAT, SONOLAR, Alt-Ergo, Colibri, goSAT, and xsat; and has
 found bugs in all of them ;)
 
+# SMT-LIB random testcase generator
+This will move to a new project. For now it is still available in
+the "python2" branch of PyMPF.
+
 # Requirements
 Python 3.5 or later.
 
