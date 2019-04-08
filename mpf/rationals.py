@@ -31,7 +31,10 @@ This module defines class to deal with Rational numbers.
 """
 
 import fractions
-import math
+try:
+    from math import gcd
+except ImportError:
+    from fractions import gcd
 
 class Rational:
     """Rational number
@@ -47,7 +50,7 @@ class Rational:
         assert b != 0
         self.a = (a if b > 0 else -a)
         self.b = abs(b)
-        denominator = math.gcd(self.a, self.b)
+        denominator = gcd(self.a, self.b)
         assert denominator > 0
         self.a = self.a // denominator
         self.b = self.b // denominator
