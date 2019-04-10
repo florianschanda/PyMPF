@@ -221,7 +221,8 @@ def q_round_to_nearest(n, tiebreak):
     alternatives if *n* is precisely between two integers.
 
     """
-    lower = (n.a - (n.a % n.b)) /  n.b
+    assert isinstance(n, Rational)
+    lower = (n.a - (n.a % n.b)) //  n.b
     upper = lower + 1
     assert Rational(lower) <= n <= Rational(upper)
 
@@ -253,7 +254,7 @@ def q_round_rna(n):
 
 def q_round_rtz(n):
     """Round to nearest integer, towards zero"""
-    i = Rational(abs(n.a) / n.b)
+    i = Rational(abs(n.a) // n.b)
     if n.isNegative():
         return -i
     else:
@@ -263,7 +264,7 @@ def q_round_rtp(n):
     """Round to nearest integer, towards positive"""
     if n.isIntegral():
         return n
-    i = abs(n.a) / n.b
+    i = abs(n.a) // n.b
     if n.isNegative():
         return Rational(-i)
     else:
@@ -273,7 +274,7 @@ def q_round_rtn(n):
     """Round to nearest integer, towards negative"""
     if n.isIntegral():
         return n
-    i = abs(n.a) / n.b
+    i = abs(n.a) // n.b
     if n.isNegative():
         return Rational(-i - 1)
     else:
