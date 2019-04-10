@@ -206,6 +206,7 @@ def q_pow2(number):
 
     *n* can be negative
     """
+    assert isinstance(number, int) and abs(number) <= 2 ** 18
     if number >= 0:
         return Rational(2 ** number)
     else:

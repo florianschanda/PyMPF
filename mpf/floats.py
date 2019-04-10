@@ -87,9 +87,15 @@ class MPF:
     >>> x.to_python_string()
     '1.0'
 
-    The lowest precision that is supported is MPF(2, 2).
+    The lowest precision that is supported is MPF(2, 2). The largest
+    *eb* supported is 18 (a practical limitation given we need to
+    compute 2 ** (2 ** eb)) which can get pretty large pretty quickly.
 
     """
+
+    MIN_EB = 2
+    MAX_EB = 18
+    MIN_SB = 2
 
     ROUNDING_MODES          = (RM_RNE, RM_RNA, RM_RTP, RM_RTN, RM_RTZ)
     ROUNDING_MODES_NEAREST  = (RM_RNE, RM_RNA)
@@ -99,8 +105,8 @@ class MPF:
         # Naming chosen so that the interface is close to SMTLIB (eb,
         # sb) and the internals close to IEEE-754 (k, p, w, t, emax,
         # emin).
-        assert eb >= 2
-        assert sb >= 2
+        assert eb >= MPF.MIN_EB and eb <= MPF.MAX_EB
+        assert sb >= MPF.MIN_SB
         assert 0 <= bitvec < 2 ** (eb + sb)
 
         self.k    = eb + sb

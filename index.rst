@@ -161,6 +161,9 @@ Changelog
 * Support pathological precisions such as MPF(2, 2) where the infinity
   boundary is in fact not an integer (3.5 in this example).
 
+* Add practical limit on the size of the exponent of 18. The infinity
+  boundary evaluates 2 ** 2 ** eb, which obviously grows very fast.
+
 1.0.3
 ^^^^^
 * Add basic documentation (fast tutorial, and basic descriptions of
