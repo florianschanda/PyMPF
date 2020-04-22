@@ -139,7 +139,7 @@ class Rational:
 
     def isIntegral(self):
         """Test if integral"""
-        return (self.a % self.b) == 0
+        return self.b == 1
 
     def to_python_int(self):
         """Convert to python int"""
