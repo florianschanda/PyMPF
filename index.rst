@@ -154,8 +154,8 @@ Changelog
 1.0
 ---
 
-1.0.4
-^^^^^
+1.0.4 (2020-05-20)
+^^^^^^^^^^^^^^^^^^
 * We now run PyLint
 
 * Support pathological precisions such as MPF(2, 2) where the infinity
@@ -164,11 +164,15 @@ Changelog
 * Add practical limit on the size of the exponent of 18. The infinity
   boundary evaluates 2 ** 2 ** eb, which obviously grows very fast.
 
-1.0.3
-^^^^^
+* More support for older python versions. We still target and support
+  3.6+, but it makes it a bit less painless to use on non-supported
+  versions.
+
+1.0.3 (2019-03-18)
+^^^^^^^^^^^^^^^^^^
 * Add basic documentation (fast tutorial, and basic descriptions of
   MPF and Rational classes).
 
-1.0.2
-^^^^^
+1.0.2 (2019-03-13)
+^^^^^^^^^^^^^^^^^^
 * First public release on PyPI.

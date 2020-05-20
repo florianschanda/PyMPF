@@ -4,28 +4,22 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>PyMPF &#8212; PyMPF 1.0.4 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.0.4',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -51,8 +45,8 @@
 <p>The PyMPF library contains two modules intended for most users:</p>
 <ul class="simple">
 <li>floats (arbitrary precision IEEE-754 floating point, see
-<a class="reference internal" href="#mpf.floats.MPF" title="mpf.floats.MPF"><code class="xref py py-class docutils literal"><span class="pre">mpf.floats.MPF</span></code></a>)</li>
-<li>rationals (rational numbers, see <a class="reference internal" href="#mpf.rationals.Rational" title="mpf.rationals.Rational"><code class="xref py py-class docutils literal"><span class="pre">mpf.rationals.Rational</span></code></a>)</li>
+<a class="reference internal" href="#mpf.floats.MPF" title="mpf.floats.MPF"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpf.floats.MPF</span></code></a>)</li>
+<li>rationals (rational numbers, see <a class="reference internal" href="#mpf.rationals.Rational" title="mpf.rationals.Rational"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpf.rationals.Rational</span></code></a>)</li>
 </ul>
 <p>It also contains the following modules indended for internal use and
 the SMT-LIB testcase generator:</p>
@@ -64,26 +58,26 @@ the SMT-LIB testcase generator:</p>
 <div class="section" id="fast-tutorial">
 <h2>Fast tutorial<a class="headerlink" href="#fast-tutorial" title="Permalink to this headline">¶</a></h2>
 <p>Import the relevant classes. Most likely you want to do this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mpf.rationals</span> <span class="k">import</span> <span class="n">Rational</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mpf.rationals</span> <span class="k">import</span> <span class="n">Rational</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mpf.floats</span> <span class="k">import</span> <span class="o">*</span>
 </pre></div>
 </div>
 <p>You can now create a float like this (here we create a single
 precision float):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>To quickly see what we have we can use the
-<a class="reference internal" href="#mpf.floats.MPF.to_python_string" title="mpf.floats.MPF.to_python_string"><code class="xref py py-func docutils literal"><span class="pre">mpf.floats.MPF.to_python_string()</span></code></a> member function.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">to_python_string</span><span class="p">()</span>
+<a class="reference internal" href="#mpf.floats.MPF.to_python_string" title="mpf.floats.MPF.to_python_string"><code class="xref py py-func docutils literal notranslate"><span class="pre">mpf.floats.MPF.to_python_string()</span></code></a> member function.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">to_python_string</span><span class="p">()</span>
 <span class="go">&#39;0.0&#39;</span>
 </pre></div>
 </div>
-<p>To set the float to a specific value, such as <span class="math">\(\frac{1}{3}\)</span> we
-can use the <a class="reference internal" href="#mpf.floats.MPF.from_rational" title="mpf.floats.MPF.from_rational"><code class="xref py py-func docutils literal"><span class="pre">mpf.floats.MPF.from_rational()</span></code></a> member
+<p>To set the float to a specific value, such as <span class="math notranslate nohighlight">\(\frac{1}{3}\)</span> we
+can use the <a class="reference internal" href="#mpf.floats.MPF.from_rational" title="mpf.floats.MPF.from_rational"><code class="xref py py-func docutils literal notranslate"><span class="pre">mpf.floats.MPF.from_rational()</span></code></a> member
 function. Since we convert from rationals to floats we might need to
 round.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">from_rational</span><span class="p">(</span><span class="n">RM_RNE</span><span class="p">,</span> <span class="n">Rational</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">from_rational</span><span class="p">(</span><span class="n">RM_RNE</span><span class="p">,</span> <span class="n">Rational</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">to_python_string</span><span class="p">()</span>
 <span class="go">&#39;0.3333333432674407958984375&#39;</span>
 </pre></div>
@@ -98,30 +92,30 @@ point number furthest away from zero. Note that this is unsupported
 on most hardware (including i686 and amd64), other floating point
 libraries (e.g. MPFR).</li>
 <li>RM_RTZ (Round to zero: always round towards zero)</li>
-<li>RM_RTP (Round to positive: always round towards <span class="math">\(+\infty\)</span>)</li>
-<li>RM_RTN (Round to negative: always round towards <span class="math">\(-\infty\)</span>)</li>
+<li>RM_RTP (Round to positive: always round towards <span class="math notranslate nohighlight">\(+\infty\)</span>)</li>
+<li>RM_RTN (Round to negative: always round towards <span class="math notranslate nohighlight">\(-\infty\)</span>)</li>
 </ul>
 <p>One of the main use-cases for this library is to generate test-cases
 for SMT-LIB. To create an SMT-LIB literal you can use the
-<a class="reference internal" href="#mpf.floats.MPF.smtlib_literal" title="mpf.floats.MPF.smtlib_literal"><code class="xref py py-func docutils literal"><span class="pre">mpf.floats.MPF.smtlib_literal()</span></code></a> function:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">smtlib_literal</span><span class="p">()</span>
+<a class="reference internal" href="#mpf.floats.MPF.smtlib_literal" title="mpf.floats.MPF.smtlib_literal"><code class="xref py py-func docutils literal notranslate"><span class="pre">mpf.floats.MPF.smtlib_literal()</span></code></a> function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">smtlib_literal</span><span class="p">()</span>
 <span class="go">&#39;(fp #b0 #b01111101 #b01010101010101010101011)&#39;</span>
 </pre></div>
 </div>
 <p>The MPF class supports all floating-point comparisons:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">y</span>
 <span class="go">True</span>
 </pre></div>
 </div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">set_nan</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">set_nan</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">y</span>
 <span class="go">False</span>
 </pre></div>
 </div>
 <p>Note that equality considers +0 and -0 to be equal. You can use the
-<a class="reference internal" href="#mpf.floats.smtlib_eq" title="mpf.floats.smtlib_eq"><code class="xref py py-func docutils literal"><span class="pre">mpf.floats.smtlib_eq()</span></code></a> if you want bitwise equality:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>
+<a class="reference internal" href="#mpf.floats.smtlib_eq" title="mpf.floats.smtlib_eq"><code class="xref py py-func docutils literal notranslate"><span class="pre">mpf.floats.smtlib_eq()</span></code></a> if you want bitwise equality:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">z</span><span class="o">.</span><span class="n">set_zero</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">set_zero</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">==</span> <span class="n">z</span>
@@ -132,18 +126,18 @@ for SMT-LIB. To create an SMT-LIB literal you can use the
 </div>
 <p>To set values you can use the following functions:</p>
 <ul class="simple">
-<li><a class="reference internal" href="#mpf.floats.MPF.from_rational" title="mpf.floats.MPF.from_rational"><code class="xref py py-func docutils literal"><span class="pre">mpf.floats.MPF.from_rational()</span></code></a> set to value closest to given rational</li>
-<li><a class="reference internal" href="#mpf.floats.MPF.set_zero" title="mpf.floats.MPF.set_zero"><code class="xref py py-func docutils literal"><span class="pre">mpf.floats.MPF.set_zero()</span></code></a> set to +0 (if sign is 0) or -0 (if
+<li><a class="reference internal" href="#mpf.floats.MPF.from_rational" title="mpf.floats.MPF.from_rational"><code class="xref py py-func docutils literal notranslate"><span class="pre">mpf.floats.MPF.from_rational()</span></code></a> set to value closest to given rational</li>
+<li><a class="reference internal" href="#mpf.floats.MPF.set_zero" title="mpf.floats.MPF.set_zero"><code class="xref py py-func docutils literal notranslate"><span class="pre">mpf.floats.MPF.set_zero()</span></code></a> set to +0 (if sign is 0) or -0 (if
 sign is 1)</li>
-<li><a class="reference internal" href="#mpf.floats.MPF.set_infinite" title="mpf.floats.MPF.set_infinite"><code class="xref py py-func docutils literal"><span class="pre">mpf.floats.MPF.set_infinite()</span></code></a> set to <span class="math">\(+\infty\)</span> (if sign
-is 0) or <span class="math">\(-\infty\)</span> (if sign is 1)</li>
-<li><a class="reference internal" href="#mpf.floats.MPF.set_nan" title="mpf.floats.MPF.set_nan"><code class="xref py py-func docutils literal"><span class="pre">mpf.floats.MPF.set_nan()</span></code></a> set to NaN. PyMPF does not support
+<li><a class="reference internal" href="#mpf.floats.MPF.set_infinite" title="mpf.floats.MPF.set_infinite"><code class="xref py py-func docutils literal notranslate"><span class="pre">mpf.floats.MPF.set_infinite()</span></code></a> set to <span class="math notranslate nohighlight">\(+\infty\)</span> (if sign
+is 0) or <span class="math notranslate nohighlight">\(-\infty\)</span> (if sign is 1)</li>
+<li><a class="reference internal" href="#mpf.floats.MPF.set_nan" title="mpf.floats.MPF.set_nan"><code class="xref py py-func docutils literal notranslate"><span class="pre">mpf.floats.MPF.set_nan()</span></code></a> set to NaN. PyMPF does not support
 the distinction between signalling and non-signalling NaNs,
 similarly to SMT-LIB.</li>
 </ul>
 <p>Finally, to do arithmetic, you can use the fp_* functions. Most take a
 rounding mode and two parameters:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">from_rational</span><span class="p">(</span><span class="n">RM_RNE</span><span class="p">,</span> <span class="n">Rational</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">from_rational</span><span class="p">(</span><span class="n">RM_RNE</span><span class="p">,</span> <span class="n">Rational</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">from_rational</span><span class="p">(</span><span class="n">RM_RNE</span><span class="p">,</span> <span class="n">Rational</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">fp_mul</span><span class="p">(</span><span class="n">RM_RNE</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">z</span><span class="o">.</span><span class="n">to_python_string</span><span class="p">()</span>
@@ -151,7 +145,7 @@ rounding mode and two parameters:</p>
 </pre></div>
 </div>
 <p>Here an example demonstrating accumulated rounding errors:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">set_zero</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">set_zero</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">y</span> <span class="o">=</span> <span class="n">fp_add</span><span class="p">(</span><span class="n">RM_RNE</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">to_python_string</span><span class="p">())</span>
@@ -213,6 +207,12 @@ rounding mode and two parameters:</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="mpf.rationals.Rational.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>a=0</em>, <em>b=1</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="mpf.rationals.Rational.__le__">
 <code class="descname">__le__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__le__" title="Permalink to this definition">¶</a></dt>
 <dd><p>&lt;=</p>
@@ -248,6 +248,12 @@ rounding mode and two parameters:</p>
 <dd><p>Exponentiation</p>
 <p>The right-hand side must be an integral Rational, otherwise
 AssertionError is raised.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.rationals.Rational.__repr__">
+<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.rationals.Rational.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
 </dd></dl>
 
 <dl class="method">
@@ -399,20 +405,22 @@ floats).</p>
 <p><em>sb</em> is the number of bits for the significand.</p>
 <p>This includes the “hidden bit”, so for example to create a
 single-precision floating point number we use:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>By default the created float is +0, however <em>bitvec</em> can be used
 to set the initial value. The expected format is an integer
-<span class="math">\(0 \le bitvec &lt; 2^{eb+sb}\)</span> corresponding to the binary
+<span class="math notranslate nohighlight">\(0 \le bitvec &lt; 2^{eb+sb}\)</span> corresponding to the binary
 interchange format. For example to create the single precision
 float representing +1:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mh">0x3f800000</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mh">0x3f800000</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">to_python_string</span><span class="p">()</span>
 <span class="go">&#39;1.0&#39;</span>
 </pre></div>
 </div>
-<p>The lowest precision that is supported is MPF(2, 2).</p>
+<p>The lowest precision that is supported is MPF(2, 2). The largest
+<em>eb</em> supported is 18 (a practical limitation given we need to
+compute 2 ** (2 ** eb)) which can get pretty large pretty quickly.</p>
 <dl class="method">
 <dt id="mpf.floats.MPF.__abs__">
 <code class="descname">__abs__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.__abs__" title="Permalink to this definition">¶</a></dt>
@@ -425,7 +433,7 @@ float representing +1:</p>
 <dd><p>Test floating-point equality</p>
 <p>Note that this is floating-point equality, so comparisons to
 NaN always fail and -0 and +0 are considered equal.</p>
-<p>If you want true equality, use <a class="reference internal" href="#mpf.floats.smtlib_eq" title="mpf.floats.smtlib_eq"><code class="xref py py-func docutils literal"><span class="pre">smtlib_eq()</span></code></a></p>
+<p>If you want true equality, use <a class="reference internal" href="#mpf.floats.smtlib_eq" title="mpf.floats.smtlib_eq"><code class="xref py py-func docutils literal notranslate"><span class="pre">smtlib_eq()</span></code></a></p>
 </dd></dl>
 
 <dl class="method">
@@ -438,6 +446,12 @@ NaN always fail and -0 and +0 are considered equal.</p>
 <dt id="mpf.floats.MPF.__gt__">
 <code class="descname">__gt__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.__gt__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test floating-point greater than</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>eb</em>, <em>sb</em>, <em>bitvec=0</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="method">
@@ -456,6 +470,18 @@ NaN always fail and -0 and +0 are considered equal.</p>
 <dt id="mpf.floats.MPF.__neg__">
 <code class="descname">__neg__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.__neg__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute inverse</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.__repr__">
+<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mpf.floats.MPF.__str__">
+<code class="descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return str(self).</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -486,13 +512,13 @@ value described by <em>q</em>, rounded according to <em>rm</em>.</p>
 RNA, at which point we always round to infinity. Numbers
 smaller than this <em>may</em> be rounded to infinity, but numbers
 larger than this will always be rounded to infinity.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span><span class="o">.</span><span class="n">inf_boundary</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">MPF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span><span class="o">.</span><span class="n">inf_boundary</span><span class="p">()</span>
 <span class="go">Rational(340282356779733661637539395458142568448)</span>
 </pre></div>
 </div>
 <p>This is usually an integer, except for pathological
 precisions.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">MPF</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">inf_boundary</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">MPF</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">inf_boundary</span><span class="p">()</span>
 <span class="go">Rational(7, 2)</span>
 </pre></div>
 </div>
@@ -577,7 +603,7 @@ number).</p>
 <p>Sets the value of the floating point number, such that</p>
 <p>The sign corresponds to <em>S</em>, the exponent is <em>E</em>, and the
 significand is <em>T</em>.</p>
-<p>This is the inverse of <a class="reference internal" href="#mpf.floats.MPF.unpack" title="mpf.floats.MPF.unpack"><code class="xref py py-func docutils literal"><span class="pre">unpack()</span></code></a>.</p>
+<p>This is the inverse of <a class="reference internal" href="#mpf.floats.MPF.unpack" title="mpf.floats.MPF.unpack"><code class="xref py py-func docutils literal notranslate"><span class="pre">unpack()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="method">
@@ -664,7 +690,7 @@ returns literals of the form (fp …).</p>
 <dt id="mpf.floats.MPF.smtlib_random_literal">
 <code class="descname">smtlib_random_literal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.smtlib_random_literal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an SMT-LIB literal (randomly chosen)</p>
-<p>Chooses randomly from <a class="reference internal" href="#mpf.floats.MPF.smtlib_literals" title="mpf.floats.MPF.smtlib_literals"><code class="xref py py-func docutils literal"><span class="pre">smtlib_literals()</span></code></a>.</p>
+<p>Chooses randomly from <a class="reference internal" href="#mpf.floats.MPF.smtlib_literals" title="mpf.floats.MPF.smtlib_literals"><code class="xref py py-func docutils literal notranslate"><span class="pre">smtlib_literals()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="method">
@@ -709,7 +735,7 @@ now.</p>
 format and then directly interpret the bit-pattern.</p>
 </div>
 <p>If you want something precise, then use
-<a class="reference internal" href="#mpf.floats.MPF.to_python_string" title="mpf.floats.MPF.to_python_string"><code class="xref py py-func docutils literal"><span class="pre">to_python_string()</span></code></a> instead.</p>
+<a class="reference internal" href="#mpf.floats.MPF.to_python_string" title="mpf.floats.MPF.to_python_string"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_python_string()</span></code></a> instead.</p>
 </dd></dl>
 
 <dl class="method">
@@ -720,14 +746,14 @@ format and then directly interpret the bit-pattern.</p>
 string (e.g. ‘0.25’), except for the following special cases:
 ‘-0’, ‘Infinity’, ‘-Infinity’, and ‘NaN’.</p>
 <p>The decimal string might be very long (but precise), so if you
-want something compact then <a class="reference internal" href="#mpf.floats.MPF.to_python_float" title="mpf.floats.MPF.to_python_float"><code class="xref py py-func docutils literal"><span class="pre">to_python_float()</span></code></a> might be
+want something compact then <a class="reference internal" href="#mpf.floats.MPF.to_python_float" title="mpf.floats.MPF.to_python_float"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_python_float()</span></code></a> might be
 more appropriate.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="mpf.floats.MPF.to_rational">
 <code class="descname">to_rational</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.MPF.to_rational" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert from MPF to <a class="reference internal" href="#mpf.rationals.Rational" title="mpf.rationals.Rational"><code class="xref py py-class docutils literal"><span class="pre">Rational</span></code></a></p>
+<dd><p>Convert from MPF to <a class="reference internal" href="#mpf.rationals.Rational" title="mpf.rationals.Rational"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rational</span></code></a></p>
 <p>Raises AssertionError for infinities or NaN.</p>
 </dd></dl>
 
@@ -737,7 +763,29 @@ more appropriate.</p>
 <dd><p>Unpack into sign, exponent, and significand</p>
 <p>Returns a tuple of integers (S, E, T) where <em>S</em> is the sign
 bit, <em>E</em> is the exponent, and <em>T</em> is the significand.</p>
-<p>This is the inverse of <a class="reference internal" href="#mpf.floats.MPF.pack" title="mpf.floats.MPF.pack"><code class="xref py py-func docutils literal"><span class="pre">pack()</span></code></a>.</p>
+<p>This is the inverse of <a class="reference internal" href="#mpf.floats.MPF.pack" title="mpf.floats.MPF.pack"><code class="xref py py-func docutils literal notranslate"><span class="pre">pack()</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="mpf.floats.Not_Implemented_Yet">
+<em class="property">exception </em><code class="descclassname">mpf.floats.</code><code class="descname">Not_Implemented_Yet</code><a class="headerlink" href="#mpf.floats.Not_Implemented_Yet" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="mpf.floats.Not_Implemented_Yet.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#mpf.floats.Not_Implemented_Yet.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="mpf.floats.Unspecified">
+<em class="property">exception </em><code class="descclassname">mpf.floats.</code><code class="descname">Unspecified</code><a class="headerlink" href="#mpf.floats.Unspecified" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="mpf.floats.Unspecified.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#mpf.floats.Unspecified.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 </dd></dl>
@@ -746,7 +794,7 @@ bit, <em>E</em> is the exponent, and <em>T</em> is the significand.</p>
 <dt id="mpf.floats.fp_add">
 <code class="descclassname">mpf.floats.</code><code class="descname">fp_add</code><span class="sig-paren">(</span><em>rm</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Floating-point addition</p>
-<p>Performs a correctly rounded <span class="math">\(left + right\)</span>. The following special
+<p>Performs a correctly rounded <span class="math notranslate nohighlight">\(left + right\)</span>. The following special
 cases apply:</p>
 <ul class="simple">
 <li>NaN propagates</li>
@@ -765,7 +813,7 @@ special case according to Section 6.3 in IEEE-754:<ul>
 <dt id="mpf.floats.fp_div">
 <code class="descclassname">mpf.floats.</code><code class="descname">fp_div</code><span class="sig-paren">(</span><em>rm</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_div" title="Permalink to this definition">¶</a></dt>
 <dd><p>Floating-point division</p>
-<p>Performs a correctly rounded <span class="math">\(left \div right\)</span>. The
+<p>Performs a correctly rounded <span class="math notranslate nohighlight">\(left \div right\)</span>. The
 following special cases apply:</p>
 <ul class="simple">
 <li>NaN propagates</li>
@@ -786,8 +834,8 @@ following special cases apply:</p>
 <dt id="mpf.floats.fp_fma">
 <code class="descclassname">mpf.floats.</code><code class="descname">fp_fma</code><span class="sig-paren">(</span><em>rm</em>, <em>x</em>, <em>y</em>, <em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_fma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Floating-point fused multiply add</p>
-<p>Performs a correctly rounded <span class="math">\(x * y + z\)</span>. The special cases
-of <a class="reference internal" href="#mpf.floats.fp_mul" title="mpf.floats.fp_mul"><code class="xref py py-func docutils literal"><span class="pre">fp_mul()</span></code></a> and <a class="reference internal" href="#mpf.floats.fp_add" title="mpf.floats.fp_add"><code class="xref py py-func docutils literal"><span class="pre">fp_add()</span></code></a> apply, and in addition:</p>
+<p>Performs a correctly rounded <span class="math notranslate nohighlight">\(x * y + z\)</span>. The special cases
+of <a class="reference internal" href="#mpf.floats.fp_mul" title="mpf.floats.fp_mul"><code class="xref py py-func docutils literal notranslate"><span class="pre">fp_mul()</span></code></a> and <a class="reference internal" href="#mpf.floats.fp_add" title="mpf.floats.fp_add"><code class="xref py py-func docutils literal notranslate"><span class="pre">fp_add()</span></code></a> apply, and in addition:</p>
 <ul class="simple">
 <li>On a precise 0 result the sign of zero is:<ul>
 <li>Preserved if the sign of x * y is the same as z</li>
@@ -838,7 +886,7 @@ of <a class="reference internal" href="#mpf.floats.fp_mul" title="mpf.floats.fp_
 <dt id="mpf.floats.fp_mul">
 <code class="descclassname">mpf.floats.</code><code class="descname">fp_mul</code><span class="sig-paren">(</span><em>rm</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_mul" title="Permalink to this definition">¶</a></dt>
 <dd><p>Floating-point multiplication</p>
-<p>Performs a correctly rounded <span class="math">\(left * right\)</span>. The following
+<p>Performs a correctly rounded <span class="math notranslate nohighlight">\(left * right\)</span>. The following
 special cases apply:</p>
 <ul class="simple">
 <li>NaN propagates</li>
@@ -885,9 +933,9 @@ special cases apply:</p>
 <dt id="mpf.floats.fp_sub">
 <code class="descclassname">mpf.floats.</code><code class="descname">fp_sub</code><span class="sig-paren">(</span><em>rm</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#mpf.floats.fp_sub" title="Permalink to this definition">¶</a></dt>
 <dd><p>Floating-point substraction</p>
-<p>Performs a correctly rounded <span class="math">\(left - right\)</span>, which is
-equivalent to <span class="math">\(left + -right\)</span>.</p>
-<p>See <a class="reference internal" href="#mpf.floats.fp_add" title="mpf.floats.fp_add"><code class="xref py py-func docutils literal"><span class="pre">fp_add()</span></code></a> for special cases.</p>
+<p>Performs a correctly rounded <span class="math notranslate nohighlight">\(left - right\)</span>, which is
+equivalent to <span class="math notranslate nohighlight">\(left + -right\)</span>.</p>
+<p>See <a class="reference internal" href="#mpf.floats.fp_add" title="mpf.floats.fp_add"><code class="xref py py-func docutils literal notranslate"><span class="pre">fp_add()</span></code></a> for special cases.</p>
 </dd></dl>
 
 <dl class="function">
@@ -920,22 +968,27 @@ equivalent to <span class="math">\(left + -right\)</span>.</p>
 <div class="section" id="id1">
 <h2>1.0<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id2">
-<h3>1.0.4<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<h3>1.0.4 (2020-05-20)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>We now run PyLint</li>
 <li>Support pathological precisions such as MPF(2, 2) where the infinity
 boundary is in fact not an integer (3.5 in this example).</li>
+<li>Add practical limit on the size of the exponent of 18. The infinity
+boundary evaluates 2 ** 2 ** eb, which obviously grows very fast.</li>
+<li>More support for older python versions. We still target and support
+3.6+, but it makes it a bit less painless to use on non-supported
+versions.</li>
 </ul>
 </div>
 <div class="section" id="id3">
-<h3>1.0.3<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<h3>1.0.3 (2019-03-18)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Add basic documentation (fast tutorial, and basic descriptions of
 MPF and Rational classes).</li>
 </ul>
 </div>
 <div class="section" id="id4">
-<h3>1.0.2<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<h3>1.0.2 (2019-03-13)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>First public release on PyPI.</li>
 </ul>
@@ -949,7 +1002,7 @@ MPF and Rational classes).</li>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table Of Contents</a></h3>
+  <h3><a href="#">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">PyMPF</a><ul>
 <li><a class="reference internal" href="#fast-tutorial">Fast tutorial</a></li>
@@ -959,9 +1012,9 @@ MPF and Rational classes).</li>
 <li><a class="reference internal" href="#module-mpf.floats">MPF</a></li>
 <li><a class="reference internal" href="#changelog">Changelog</a><ul>
 <li><a class="reference internal" href="#id1">1.0</a><ul>
-<li><a class="reference internal" href="#id2">1.0.4</a></li>
-<li><a class="reference internal" href="#id3">1.0.3</a></li>
-<li><a class="reference internal" href="#id4">1.0.2</a></li>
+<li><a class="reference internal" href="#id2">1.0.4 (2020-05-20)</a></li>
+<li><a class="reference internal" href="#id3">1.0.3 (2019-03-18)</a></li>
+<li><a class="reference internal" href="#id4">1.0.2 (2019-03-13)</a></li>
 </ul>
 </li>
 </ul>
@@ -977,12 +1030,14 @@ MPF and Rational classes).</li>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -1003,7 +1058,7 @@ MPF and Rational classes).</li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2019, Florian Schanda.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
     </div>
   </body>
 </html>
